@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<ValidationSet>
+    <InstalledPrereqs>
+        <Program Name="Web Farm Framework" />
+        <Program Name="External Cache" />
+        <Program Name="URL Rewrite" />
+        <Program Name="Application Request Routing" />
+    </InstalledPrereqs>
+    <NETFramework Version="4.5.2" Release="379893" />
+    <WindowsFeatures>
+        <WindowsFeature Name="Web-DAV-Publishing" Installed="false" />
+    </WindowsFeatures>
+</ValidationSet>

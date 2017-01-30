@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Update Folder="ConfigFiles">
+    <Item OldValue="ADS-005" NewValue="ADS-001" />
+    <Item OldValue="SEG-005" NewValue="SEG-001" />
+    <Item OldValue="ACC-005" NewValue="ACC-001" />
+    <Item OldValue="CON-005" NewValue="CON-001" />
+    <Item OldValue="ADS-005" NewValue="ADS-001" />
+</Update>

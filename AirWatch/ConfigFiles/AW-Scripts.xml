@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<ScriptsSet>
+    <Script Server="ADS-001,ADS-002,CON-001,CON-002" FilePath="powershell.exe" Arguments="-file SCRIPTPATH\Install\Set-RegistryServicesStartTimeout.ps1 -curLocation SCRIPTPATH -timeout 240000 ; exit $LastExitCode" InstallAccount="agilitydeploy" Desc="" />
+</ScriptsSet>

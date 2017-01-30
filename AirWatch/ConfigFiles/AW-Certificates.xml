@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<SSLCertificates>
+    <Certificate Server="ADS-001" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\CA" BindTo="Default Web Site" ></Certificate>
+    <Certificate Server="CON-001" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\CA" BindTo="Default Web Site" ></Certificate>
+    <Certificate Server="ADS-002" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\CA" BindTo="Default Web Site" ></Certificate>
+    <Certificate Server="CON-002" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\CA" BindTo="Default Web Site" ></Certificate>
+</SSLCertificates>

@@ -1,0 +1,18 @@
+﻿<!-- 
+    Public role is added by default when a login is created and Membership of the public role cannot be changed. Therefore, DO NOT list public. 
+    All properties within the node must always be included. The property LogOnLocally is the only optional property.
+    If you have LogOnLocally="FALSE" and AddToLocalAdministrators="TRUE" then AddToLocalAdministrators="TRUE" will take precedence
+    If you have AddToLocalAdministrators="TRUE" and IsDomainAccount="FALSE" will not do anything
+    You cannot have IsDomainAccount="FALSE" and LogOnLocally="TRUE" will do not do anything
+    Computer cannot be assigned a SQL role.
+    Use ComponentID and InstanceID to identify a computer.
+    SQL Roles are comma-delimiterd string.
+    When IsDomainAccount="FALSE" you must include the Password attribute. 
+    If Password is blank then it will get the password from key/value store, 
+    this means that the local name must equal the domain (service) account name
+    
+    Note: If you add windows users to this file post the VM being provisioned then ensure you run the relevant script on ALL nodes within the cluster
+-->
+<UsersConfig>
+        <Account Type="user" Name="svc_aw" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" LogOnAsService="TRUE" DBInstanceName="" SQLRoles=""></Account>
+</UsersConfig>

@@ -1,0 +1,20 @@
+﻿<doc>
+    <WindowsFeature FeatureName="Net-Framework-45-Core"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Server"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Default-Doc"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Dir-Browsing"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Errors"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Static-Content"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Redirect"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Mgmt-Console"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Metabase"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Net-ext"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Net-ext45"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Asp"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Asp-Net"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Asp-Net45"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-ISAPI-Ext"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-ISAPI-Filter"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Includes"></WindowsFeature>
+    <WindowsFeature FeatureName="Telnet-Client"></WindowsFeature>
+</doc>

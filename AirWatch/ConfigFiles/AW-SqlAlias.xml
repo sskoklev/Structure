@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<DBServers>
+    <Alias Name="AIRWATCH_DB" Create="true" DBServer="DBS-501" DBInstance="MWSMOBILITY04" DBPort="49004"></Alias>
+</DBServers>

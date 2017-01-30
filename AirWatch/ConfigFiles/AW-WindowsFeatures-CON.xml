@@ -1,0 +1,30 @@
+﻿<doc>
+    <WindowsFeature FeatureName="Net-Framework-45-Core"></WindowsFeature>  
+    <WindowsFeature FeatureName="Web-Server"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-WebServer"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Static-Content"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Default-Doc"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Dir-Browsing"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Errors"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Redirect"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Asp-Net"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Asp-Net45"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Net-Ext"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Net-Ext45"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-ASP"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-ISAPI-Filter"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Logging"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Log-Libraries"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Security"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Filtering"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Http-Tracing"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Custom-Logging"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Stat-Compression"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Dyn-Compression"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Mgmt-Tools"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Mgmt-Console"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Mgmt-Compat"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-Metabase"></WindowsFeature>
+    <WindowsFeature FeatureName="Web-ISAPI-Ext"></WindowsFeature>
+    <WindowsFeature FeatureName="MSMQ"></WindowsFeature>
+</doc>

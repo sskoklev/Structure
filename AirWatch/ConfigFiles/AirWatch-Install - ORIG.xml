@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<InstallSet InstallAccount="svc_aw" DNSZone="mwsaust.net" CertificateLocation="SCRIPTPATH\SSLCertificates\mwsaust_Jun2016_export.pfx" CertificatePassword="mws2Passw0rd">
+    <Install Server="ADS-001" InstallType="Database"
+                FilePath="\InstallMedia\8.4FP06_Install\DB\AirWatch_DB_8.4_FP06_Setup.exe" 
+                ConfigFileName = ""
+                Arguments="/S /v" Parameters="/qn /l*v SCRIPTPATH\Logs\CURRENTDATE-AirWatch_DB_8.4_FP06-setup-DB.log ACCEPTEULA=1 INSTALLDIR=E:\AirWatch IS_SQLSERVER_DATABASE=AirWatch_CUSTOMERID IS_SQLSERVER_SERVER=AIRWATCH_DB" 
+                Desc="AirWatch_DB_8.4_FP06_Setup Database" />
+    <Install Server="ADS-001,ADS-002" InstallType="Application"
+                FilePath="\InstallMedia\8.4FP06_Install\Application\AirWatch_Application_8.4_FP06_Full_Install.exe" 
+                ConfigFileName = "AirWatch-ConsoleSetup-DS.xml"
+                Arguments="/S /v" 
+                Parameters="/qn /l*v SCRIPTPATH\Logs\CURRENTDATE-AirWatch_App_8.4_FP06-setup-APP.log ACCEPTEULA=1 AWUSESETUPCONFIG=3 AWSETUPCONFIFFILENAME=CONFIGFILENAME AWSETUPCONFIGFILE=SCRIPTPATH\ConfigFiles\CONFIGFILENAME" 
+                Desc="AirWatch_DB_8.4_FP06_Setup Application" />
+    <Install Server="CON-001,CON-002" InstallType="Application"
+                FilePath="\InstallMedia\8.4FP06_Install\Application\AirWatch_Application_8.4_FP06_Full_Install.exe" 
+                ConfigFileName = "AirWatch-ConsoleSetup-CON.xml"
+                Arguments="/S /v" 
+                Parameters="/qn /l*v SCRIPTPATH\Logs\CURRENTDATE-AirWatch_App_8.4_FP06-setup-APP.log ACCEPTEULA=1 AWUSESETUPCONFIG=3 AWSETUPCONFIFFILENAME=CONFIGFILENAME AWSETUPCONFIGFILE=SCRIPTPATH\ConfigFiles\CONFIGFILENAME" 
+                Desc="AirWatch_DB_8.4_FP06_Setup Application" />
+    <Install Server="DBS-501" InstallType="Reports" DBInstance="MWSMOBILITY04"
+                FilePath="\InstallMedia\8.4FP06_Install\Reports\AirWatch_Reports_8.4_FP06_Setup.exe" 
+                ConfigFileName = ""
+                Arguments="/S /v" 
+                Parameters="/qn /l*v SCRIPTPATH\Logs\CURRENTDATE-AirWatch_App_8.4_FP06-setup-RPT.log 
+ACCEPTEULA=1
+INSTALLDIR=E:\AirWatch
+IS_SQLSERVER_DATABASE=AirWatch_CUSTOMERID
+IS_SQLSERVER_SERVER=AIRWATCH_DB
+IS_SQLSERVER_AUTHENTICATION=0
+AWREPORTSERVERURL=http://DBSERVER/ReportServer_INSTANCENAME
+AWSMTPSERVER=smtp.mail.com
+AWSMTPPORT=25
+AWSMTPSENDER=noreply@mwsaust.net" 
+                AWRSEXE="E:\Program Files (x86)\Microsoft SQL Server\110\Tools\Binn\rs.exe"
+                AWRSSVCLOCATION="E:\Program Files\Microsoft SQL Server\MSRS11.INSTANCENAME\Reporting Services"
+                AWRSLOCATION="E:\Program Files\Microsoft SQL Server\MSRS11.INSTANCENAME\Reporting Services"
+                Desc="AirWatch_DB_8.4_FP06_Setup Reports" />
+</InstallSet>

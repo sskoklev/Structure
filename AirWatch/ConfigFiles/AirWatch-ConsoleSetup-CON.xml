@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<properties>
+  <property name="ADDLOCAL" value="Web_Console,AirWatch_API_Website,AirWatch_Services,AirWatch_Agent_Builder,AirWatch_Content_Delivery,AirWatch_Device_Scheduler,AirWatch_Directory_Sync_Service,GEM_Services,AirWatch_GEM_InventoryService,AirWatch_Integration_Service,AirWatch_MarketPlace,AirWatch_Messaging_Service,AirWatch_Policy_Engine,AirWatch_SMS_Service,AirWatch_Website,Bulk_Import_Service,Cisco_ISE_Integration,Common,Content_Pull_Service,Default_Website,Event_Change_Queue_Monitor,MEG_Queue_Service" />
+  <property name="INSTALLDIR" value="E:\AirWatch\" />
+  <property name="IS_SQLSERVER_SERVER" value="AIRWATCH_DB" />
+  <property name="IS_SQLSERVER_AUTHENTICATION" value="0" />
+  <property name="IS_SQLSERVER_USERNAME" value="" />
+  <property name="IS_SQLSERVER_DATABASE" value="AirWatch_CUSTOMERID" />
+  <property name="IS_SQLSERVER_PASSWORD" value="" />
+  <property name="IS_NET_API_LOGON_USERNAME" value="DOMAIN\SERVICEACCOUNT" />
+  <property name="IS_NET_API_LOGON_PASSWORD" value="SVCACCTPASSWORD" />
+  <property name="AWSERVER" value="mdmawcon01.DNSZONE" />
+  <property name="AWSERVERSCHEME" value="1" />
+  <property name="AWSERVERDS" value="mdmawdsded.DNSZONE" />
+  <property name="AWSERVERDSSCHEME" value="1" />
+  <property name="AWAPISSLOFFLOADED" value="1" />
+  <property name="AWWEBSITE" value="Default Web Site" />
+  <property name="AWSITENUMBER" value="1" />
+  <property name="AWTCPPORT" value="80" />
+  <property name="ACMSERVERIP" value="0.0.0.0" />
+  <property name="ACMSERVERPORT" value="2001" />
+  <property name="ACMWCPORT" value="" />
+  <property name="AWCMCLUSTER" value="1" />
+  <property name="AWCMNODES" value="" />
+  <property name="AWCMSSLOFFLOADED" value="" />
+  <property name="AWCMUSEOWNCERT" value="" />
+  <property name="AWCMCERT" value="" />
+  <property name="AwcmCertPass" value="" />
+  <property name="AWGEMCOMPANY" value="" />
+  <property name="AWGEMENVTYPE" value="Production" />
+  <property name="AWPARTNERID" value="" />
+  <property name="AWAMIURL" value="http://localhost:9001" />
+  <property name="AWGPLAYSEARCHPROXY" value="1" />
+  <property name="AWGPHTTPHOST" value="" />
+  <property name="AWGPHTTPPORT" value="3128" />
+  <property name="AWGPHTTPPASSENABLED" value="" />
+  <property name="AWGPHTTPUSERNAME" value="" />
+  <property name="AWGPSOCKSHOST" value="" />
+  <property name="AWGPSOCKSPORT" value="1080" />
+  <property name="AWGPSOCKSPASSENABLED" value="" />
+  <property name="AWGPSOCKSUSERNAME" value="" />
+  <property name="AWSERVERTN" value="" />
+  <property name="AWSERVERTNINTIP" value="" />
+  <property name="AWSERVERTNLISTENIP" value="All Interfaces" />
+  <property name="AWSERVERTNPORT" value="8888" />
+  <property name="AWSERVERTNSCHEME" value="" />
+  <property name="AWTUNNELQUEUEINTIP" value="" />
+  <property name="AWTUNNELREMOTEQ" value="" />
+  <property name="AWTUNNELREMOTEQNAME" value="awtunnel" />
+  <property name="AWTUNNELSERVERFRIENDLYNAME" value="" />
+  <property name="AWRCTSPRIVATEPORT" value="7779" />
+  <property name="AWRCTSPUBLICPORT" value="7778" />
+  <property name="AWDEPLOYMODE" value="Prod" />
+</properties>

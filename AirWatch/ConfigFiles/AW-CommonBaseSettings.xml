@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<Settings>
+    <Volumes>
+        <Volume Provision="true" DriveLetter="F" Name="PageFile" />
+        <Volume Provision="true" DriveLetter="E" Name="Application" />
+    </Volumes>
+    <PageFile Provision="true" PageFilePath="F:\pagefile.sys" MaximumSizeMB="48000" InitialSizeMB="48000" />
+    <ExtractFilesSet>
+        <ExtractFiles Provision="true" InstallMedia="\InstallMedia" ExtractionTool="\7z.exe" />
+    </ExtractFilesSet>
+</Settings>
