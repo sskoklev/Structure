@@ -1,0 +1,4 @@
+﻿<doc>
+  <WindowsFeature FeatureName="Failover-Clustering"></WindowsFeature>  
+  <WindowsFeature FeatureName="RSAT-AD-Tools"></WindowsFeature>  
+</doc>

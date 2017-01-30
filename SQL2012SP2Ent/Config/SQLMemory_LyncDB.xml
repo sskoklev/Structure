@@ -1,0 +1,18 @@
+<doc>
+    <!-- 
+        Minimum memory is in MB
+        Ensure that the total minimum memory is not greater than total avialable (minus OS reserved amount), otherwise memory will not be set.
+    -->
+    <SQLMemoryConfig>
+
+    </SQLMemoryConfig>
+    <!-- 
+        Percentage of Total Server Memory available to reserve for OS.
+        Eg. total memory = 64GB
+            10 % = 6GB
+            6GB of server memory will be reserved for OS
+    -->
+    <OSMemoryConfig>
+
+    </OSMemoryConfig>
+</doc>

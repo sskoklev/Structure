@@ -1,0 +1,20 @@
+<!-- 
+    All properties within the node must always be included.
+    Port number will be converedt from string to int within PS script
+    SQLInstanceName does not include server name
+-->
+<PortsConfig>
+        <Port SQLInstanceName="MWSSPCONFIG08" PortNumber="49008"> </Port>
+        <Port SQLInstanceName="MWSSPCONTENT09" PortNumber="49009"> </Port>
+
+ <!-- The instance below are no longer provisioned in order to reduce the overhead introduced b a large number of SQL instances
+
+        <Port SQLInstanceName="MWSSPUSERPROF10" PortNumber="49010"> </Port>
+        <Port SQLInstanceName="MWSSPSECSTORE11" PortNumber="49011"> </Port>
+        <Port SQLInstanceName="MWSSPSEARCH12" PortNumber="49012"> </Port>
+        <Port SQLInstanceName="MWSSPSVCAPPCO13" PortNumber="49013"> </Port>
+        <Port SQLInstanceName="MWSSPSVCAPPSV14" PortNumber="49014"> </Port>
+
+-->
+
+</PortsConfig>

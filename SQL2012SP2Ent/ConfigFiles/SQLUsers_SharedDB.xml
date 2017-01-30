@@ -1,0 +1,70 @@
+﻿<!-- 
+    Public role is added by default when a login is created and Membership of the public role cannot be changed. Therefore, DO NOT list public. 
+    All properties within the node must always be included. The property LogOnLocally is the only optional property.
+    If you have LogOnLocally="FALSE" and AddToLocalAdministrators="TRUE" then AddToLocalAdministrators="TRUE" will take precedence
+    If you have AddToLocalAdministrators="TRUE" and IsDomainAccount="FALSE" will not do anything
+    You cannot have IsDomainAccount="FALSE" and LogOnLocally="TRUE" will do not do anything
+    Computer cannot be assigned a SQL role.
+    Use ComponentID and InstanceID to identify a computer.
+    SQL Roles are comma-delimiterd string.
+    When IsDomainAccount="FALSE" you must include the Password attribute. 
+    If Password is blank then it will get the password from key/value store, 
+    this means that the local name must equal the domain (service) account name
+    
+    Note: If you add windows users to this file post the VM being provisioned then ensure you run the relevant script on ALL nodes within the cluster
+-->
+<UsersConfig>
+
+    <Account Type="user" Name="z-da-pvssqladmin" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-002\MWSVDS02" SQLRoles="sysadmin,dbCreator"> </Account>
+    <Account Type="user" Name="z-da-pvsinstall" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" > </Account>
+    <Account Type="user" Name="z-da-XDCInstall" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-002\MWSVDS02" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-XDCsqladmin" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-002\MWSVDS02" SQLRoles="sysadmin,dbCreator"> </Account>
+
+    <Account Type="user" Name="SVC_SCCM_INSTALL" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-001\MWSPCDEVICES01" SQLRoles="sysadmin"> </Account>
+
+    <Account Type="user" Name="z-da-om-csda" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" LogOnLocally="TRUE" DBInstanceName="CNN-100\MWSCore100" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-omsrva" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" LogOnLocally="TRUE" > </Account>
+    <Account Type="user" Name="z-da-sql-omdwritr" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" LogOnLocally="TRUE" > </Account>
+    <Account Type="user" Name="z-da-sql-omdredr" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" LogOnLocally="TRUE" > </Account>
+
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-001\MWSPCDEVICES01" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-002\MWSVDS02" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-003\MWSAPPSENSE03" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-004\MWSMOBILITY04" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-100\MWSCore100" SQLRoles="sysadmin"> </Account>
+
+    <Account Type="user" Name="z-da-aemconfig" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-003\MWSAPPSENSE03" SQLRoles="sysadmin,dbCreator"> </Account>
+    <Account Type="user" Name="z-da-aemservice" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-003\MWSAPPSENSE03" SQLRoles="sysadmin,dbCreator"> </Account>
+
+    <Account Type="user" Name="SVC_FIM" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-100\MWSCore100" SQLRoles="sysadmin,dbCreator"> </Account>
+
+    <Account Type="user" Name="SVC_AVECTO_INSTALL" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-001\MWSPCDEVICES01" SQLRoles="sysadmin,dbCreator"> </Account>
+
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-001\MWSPCDEVICES01" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-002\MWSVDS02" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-003\MWSAPPSENSE03" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-004\MWSMOBILITY04" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-100\MWSCore100" SQLRoles="sysadmin"> </Account>
+
+    <Account Type="user" Name="SVC_AW" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-004\MWSMOBILITY04" SQLRoles="sysadmin,dbCreator"> </Account>
+    <Account Type="user" Name="SVC_XDM" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-004\MWSMOBILITY04" SQLRoles="sysadmin,dbCreator"> </Account>
+    <Account Type="user" Name="SVC_XDM" Password="" IsDomainAccount="FALSE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-004\MWSMOBILITY04" SQLRoles="sysadmin,dbCreator"> </Account>
+    
+  <!-- Now merged into MWSCore100 SQL instance, including WebStore which was previous in MWSPCDevices01
+    <Account Type="user" Name="z-da-om-csda" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" LogOnLocally="TRUE" DBInstanceName="CNN-007\MWSSCOM07" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-007\MWSSCOM07" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-019\MWSFIM19" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-021\MWSSCOR21" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="SVC_FIM" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-019\MWSFIM19" SQLRoles="sysadmin,dbCreator"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-007\MWSSCOM07" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-019\MWSFIM19" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-021\MWSSCOR21" SQLRoles="sysadmin"> </Account>
+ -->
+
+  <!-- Not enough products utilise SSRS to warrant a dedicated instance, so will now be installed with the specific product SQL instance
+    <Account Type="user" Name="SVC_SCCM_INSTALL" IsDomainAccount="TRUE" AddToLocalAdministrators="TRUE" DBInstanceName="CNN-005\MWSSSRS05" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="perm-d-mws-sql server administrators" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-005\MWSSSRS05" SQLRoles="sysadmin"> </Account>
+    <Account Type="user" Name="z-da-sql-omact" IsDomainAccount="TRUE" AddToLocalAdministrators="FALSE" DBInstanceName="CNN-005\MWSSSRS05" SQLRoles="sysadmin"> </Account>
+-->
+
+</UsersConfig>

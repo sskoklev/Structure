@@ -1,0 +1,8 @@
+<doc>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSRTC16_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSDATA17_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSPCHAT18_Secondary.INI"></processToLaunch>
+
+  <!-- the ini file below must be executed after the install of MWSSSRS05 -->
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSRTC16_Service_Secondary.ini"></processToLaunch>
+</doc>

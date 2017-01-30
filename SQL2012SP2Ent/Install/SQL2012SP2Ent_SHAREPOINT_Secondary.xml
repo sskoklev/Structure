@@ -1,0 +1,15 @@
+<doc>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPCONFIG08_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPCONTENT09_Secondary.INI"></processToLaunch>
+
+ <!-- The instance below are no longer provisioned in order to reduce the overhead introduced b a large number of SQL instances
+
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPUSERPROF10_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPSECSTORE11_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPSEARCH12_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPSVCAPPCO13_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\SharePoint\ConfigurationFile_MWSSPSVCAPPSV14_Secondary.INI"></processToLaunch>
+
+  -->
+
+</doc>

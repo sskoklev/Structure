@@ -1,0 +1,24 @@
+<!-- 
+    All properties within the node must always be included.
+    Port number will be converedt from string to int within PS script
+    SQLInstanceName does not include server name
+-->
+<PortsConfig>
+        <Port SQLInstanceName="MWSPCDEVICES01" PortNumber="49001"> </Port>
+        <Port SQLInstanceName="MWSVDS02" PortNumber="49002"> </Port>
+        <Port SQLInstanceName="MWSAPPSENSE03" PortNumber="49003"> </Port>
+        <Port SQLInstanceName="MWSMOBILITY04" PortNumber="49004"> </Port>
+        <Port SQLInstanceName="MWSTDT06" PortNumber="49006"> </Port>
+        <Port SQLInstanceName="MWSCore100" PortNumber="49100"> </Port>
+
+        <!-- Now merged into MWSCore100 SQL instance, including WebStore which was previous in MWSPCDevices01
+        <Port SQLInstanceName="MWSSCOM07" PortNumber="49007"> </Port>
+        <Port SQLInstanceName="MWSFIM19" PortNumber="49019"> </Port>
+        <Port SQLInstanceName="MWSSCOR21" PortNumber="49021"> </Port>
+        -->
+
+        <!-- Not enough products utilise SSRS to warrant a dedicated instance, so will now be installed with the specific product SQL instance
+        <Port SQLInstanceName="MWSSSRS05" PortNumber="49005"> </Port>
+        -->
+
+</PortsConfig>

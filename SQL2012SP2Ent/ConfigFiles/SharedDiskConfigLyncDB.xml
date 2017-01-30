@@ -1,0 +1,6 @@
+﻿<doc>
+  <SharedDisk Number="1" DiskLabel="WITNESS" DriveLetter="W" Type="Witness" Size="1"></SharedDisk>  
+  <SharedDisk Number="2" DiskLabel="RTC" DriveLetter="J" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="3" DiskLabel="DATA" DriveLetter="K" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="4" DiskLabel="PCHAT" DriveLetter="L" Type="Data" Size="1"></SharedDisk>  
+</doc>

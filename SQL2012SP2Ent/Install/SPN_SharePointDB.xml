@@ -1,0 +1,8 @@
+﻿<!--
+Ensure that Component ID and Instance ID are used and NOT server name
+The Account name will be replaced with the domain\service account for DB services always
+Set useFQDN="TRUE" if you need t register a SPN for the FQDN
+-->
+<doc>
+
+</doc>

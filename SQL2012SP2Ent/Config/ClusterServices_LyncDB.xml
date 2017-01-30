@@ -1,0 +1,8 @@
+<doc>
+      <GenericClusterService 
+            ClusterName="CLN-003" 
+            ServiceName="CLG-300" 
+            DependantService='ReportServer$MWSRTC16'
+            StaticIP="10.5.7.223"> 
+      </GenericClusterService>
+</doc>

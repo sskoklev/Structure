@@ -1,0 +1,5 @@
+<doc>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSRTC16_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSDATA17_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Lync\ConfigurationFile_MWSPCHAT18_Primary.INI"></processToLaunch>
+</doc>

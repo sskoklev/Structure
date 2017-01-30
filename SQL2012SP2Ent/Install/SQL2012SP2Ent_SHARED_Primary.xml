@@ -1,0 +1,22 @@
+<doc>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSCORE100_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSPCDEVICES01_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSVDS02_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSAPPSENSE03_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSMOBILITY04_Primary.INI"></processToLaunch>
+
+  <!-- Only required for very large implementations, 25K+ users.
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSTDT06_Primary.INI"></processToLaunch>
+  -->
+
+  <!-- Now merged into MWSCore100 SQL instance, including WebStore which was previous in MWSPCDevices01
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSCOM07_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSFIM19_Primary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSCOR21_Primary.INI"></processToLaunch>
+  -->
+
+  <!-- Not enough products utilise SSRS to warrant a dedicated instance, so will now be installed with the specific product SQL instance
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSSRS05_Primary.INI"></processToLaunch>
+  -->
+
+</doc>

@@ -1,0 +1,10 @@
+﻿<doc>
+    <CommonProperty 
+      RootLocation="Registry::HKEY_LOCAL_MACHINE\Software" 
+      CustomNode="MWS2" 
+      CustomNodeDescription="Hive to track which Windows and DB Clusters have been configured.">
+    </CommonProperty>
+    <HiveProperty PropName="IsSharedDiskConfigured" PropType="String" PropValue="False"></HiveProperty>  
+    <HiveProperty PropName="IsWindowsClusterConfigured" PropType="String" PropValue="False"></HiveProperty>  
+    <HiveProperty PropName="IsSQLClusterConfigured" PropType="String" PropValue="False"></HiveProperty>  
+</doc>

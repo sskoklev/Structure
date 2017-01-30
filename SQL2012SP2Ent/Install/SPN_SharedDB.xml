@@ -1,0 +1,18 @@
+﻿<!--
+Ensure that Component ID and Instance ID are used and NOT server name
+The Account name will be replaced with the domain\service account for DB services always
+Set useFQDN="TRUE" if you need to register a SPN for the FQDN
+-->
+<doc>
+  <SPN Command="setspn -S MSSQLSvc/CNN-100:MWSCore100" Server="CNN-100" Account="svc_SQL" useFQDN="FALSE" ></SPN>  
+  <SPN Command="setspn -S MSSQLSvc/CNN-100:MWSCore100" Server="CNN-100" Account="svc_SQL" useFQDN="TRUE" ></SPN> 
+  
+  <SPN Command="setspn -S MSSQLSvc/CNN-100:49100" Server="CNN-100" Account="svc_SQL" useFQDN="FALSE" ></SPN>  
+  <SPN Command="setspn -S MSSQLSvc/CNN-100:49100" Server="CNN-100" Account="svc_SQL" useFQDN="TRUE" ></SPN>  
+  
+  <!-- Only required is SSRS will be deployed in a HA configuration -->
+  <!--
+  <SPN Command="setspn -S http/CLG-400" Server="CLG-400" Account="svc_SQL" useFQDN="FALSE" ></SPN>  
+  <SPN Command="setspn -S http/CLG-400" Server="CLG-400" Account="svc_SQL" useFQDN="TRUE" ></SPN>  
+  -->
+</doc>

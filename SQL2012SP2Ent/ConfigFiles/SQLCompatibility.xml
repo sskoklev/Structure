@@ -1,0 +1,17 @@
+﻿<!-- 
+    All properties are mandatory
+    DBInstanceName, must use the Component ID and Instance ID followed by the instance name, for example, CNN-004\MWSMOBILITY04
+    DBList, comma seperated list of DB names to update, eg "Database1,Database2"
+    CompatibilityMode   = 2008 for SQL 2008
+                        = 2012 for SQL 2012
+                        ** other version are not catered for and will require a script change
+    If DBInstanceName it will be logged and script will continue on, hence entries specific to POC
+-->
+<SQLCompatbility>
+    <!-- Production -->
+    <Instance DBInstanceName="CNN-004\MWSMOBILITY04" DBList="Model" CompatibilityMode="2008"> </Instance>
+
+    <!-- POC \ SandPit -->
+    <Instance DBInstanceName="DBS-101\MWSMOBILITY04" DBList="Model" CompatibilityMode="2008"> </Instance>
+
+</SQLCompatbility>

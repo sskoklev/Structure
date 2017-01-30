@@ -1,0 +1,15 @@
+﻿<doc>
+  <SharedDisk Number="1" DiskLabel="WITNESS" DriveLetter="W" Type="Witness" Size="1"></SharedDisk>  
+  <SharedDisk Number="2" DiskLabel="SPCONFIG" DriveLetter="J" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="3" DiskLabel="SPCONTENT" DriveLetter="K" Type="Data" Size="1"></SharedDisk> 
+
+ <!-- The instance below are no longer provisioned in order to reduce the overhead introduced b a large number of SQL instances
+ 
+  <SharedDisk Number="4" DiskLabel="SPUSERPROF" DriveLetter="L" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="5" DiskLabel="SPSECSTORE" DriveLetter="M" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="6" DiskLabel="SPSEARCH" DriveLetter="N" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="7" DiskLabel="SPSVCAPPCO" DriveLetter="O" Type="Data" Size="1"></SharedDisk>  
+  <SharedDisk Number="8" DiskLabel="SPSVCAPPSV" DriveLetter="P" Type="Data" Size="1"></SharedDisk>  
+ -->
+
+</doc>

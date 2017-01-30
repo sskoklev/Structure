@@ -1,0 +1,10 @@
+<!-- 
+    All properties within the node must always be included.
+    Port number will be converedt from string to int within PS script
+    SQLInstanceName does not include server name
+-->
+<PortsConfig>
+        <Port SQLInstanceName="MWSRTC16" PortNumber="49016"> </Port>
+        <Port SQLInstanceName="MWSDATA17" PortNumber="49017"> </Port>
+        <Port SQLInstanceName="MWSPCHAT18" PortNumber="49018"> </Port>
+</PortsConfig>

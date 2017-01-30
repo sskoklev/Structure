@@ -1,0 +1,29 @@
+﻿<doc>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSCore100_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSPCDEVICES01_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSVDS02_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSAPPSENSE03_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSMOBILITY04_Secondary.INI"></processToLaunch>
+
+  <!-- Only required for very large implementations, 25K+ users.
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSTDT06_Secondary.INI"></processToLaunch>
+  -->
+
+  <!-- the below cluster services are only required in SSRS is to be deployed in a HA configuration -->
+  <!-- the ini file below must be executed after the install of related DB instance -->
+  <!--
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSSRS05_Service_Secondary.ini"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSCOM07_Service_Secondary.ini"></processToLaunch>
+  -->
+
+  <!-- Now merged into MWSCore100 SQL instance, including WebStore which was previous in MWSPCDevices01
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSCOM07_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSFIM19_Secondary.INI"></processToLaunch>
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSCOR21_Secondary.INI"></processToLaunch>
+ -->
+
+  <!-- Not enough products utilise SSRS to warrant a dedicated instance, so will now be installed with the specific product SQL instance
+  <processToLaunch FullFileName="InstallMedia\Setup.exe" CmdLineArgument="/ConfigurationFile=Install\Shared\ConfigurationFile_MWSSSRS05_Secondary.INI"></processToLaunch>
+  -->
+
+</doc>

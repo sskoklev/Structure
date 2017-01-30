@@ -1,0 +1,13 @@
+﻿<doc>
+  <WindowsCluster 
+        ClusterName="CLN-001" 
+        ClusterDescription="Shared Database Cluster"
+        PrimaryNode="DBS-001" 
+        SecondaryNode="DBS-002" 
+        ClusterIP="10.2.20.200" 
+        ClusterNetwork="CNO-001" 
+        ClusterIPName="CNO-002" 
+        WitnessDiskName="WITNESS"
+        ManagementIPName="ManagementIP">
+  </WindowsCluster>  
+</doc>

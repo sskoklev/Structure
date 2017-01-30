@@ -1,0 +1,26 @@
+﻿<!--
+Size must be in GB
+
+-->
+
+<doc>
+  <SharedDisk Number="1" DiskLabel="WITNESS" DriveLetter="Q" Type="Witness" Size="1"></SharedDisk>  
+  <SharedDisk Number="2" DiskLabel="PCDEVICES" DriveLetter="R" Type="Data" Size="125"></SharedDisk>  
+  <SharedDisk Number="3" DiskLabel="VDS" DriveLetter="K" Type="Data" Size="140"></SharedDisk>  
+  <SharedDisk Number="4" DiskLabel="APPSENSE" DriveLetter="L" Type="Data" Size="60"></SharedDisk>  
+  <SharedDisk Number="5" DiskLabel="MOBILITY" DriveLetter="M" Type="Data" Size="40"></SharedDisk>  
+  <SharedDisk Number="6" DiskLabel="Core" DriveLetter="X" Type="Data" Size="210"></SharedDisk> 
+
+  <!-- Only required for very large implementations, 25K+ users.
+  <SharedDisk Number="6" DiskLabel="TDT" DriveLetter="O" Type="Data"></SharedDisk>  
+  -->
+  
+  <!-- Now merged into MWSCore100 SQL instance, including WebStore which was previous in MWSPCDevices01
+  <SharedDisk Number="8" DiskLabel="SCOM" DriveLetter="P" Type="Data"></SharedDisk> 
+  -->
+ 
+  <!-- Not enough products utilise SSRS to warrant a dedicated instance, so will now be installed with the specific product SQL instance
+  <SharedDisk Number="6" DiskLabel="SSRS" DriveLetter="N" Type="Data"></SharedDisk>  
+  -->
+
+</doc>

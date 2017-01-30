@@ -1,0 +1,13 @@
+﻿<doc>
+  <WindowsCluster 
+        ClusterName="CLN-003" 
+        ClusterDescription="Lync Database Cluster"
+        PrimaryNode="DBS-005" 
+        SecondaryNode="DBS-006" 
+        ClusterIP="10.5.7.221" 
+        ClusterNetwork="CNO-005" 
+        ClusterIPName="CNO-006" 
+        WitnessDiskName="WITNESS"
+        ManagementIPName="ManagementIP">
+  </WindowsCluster>  
+</doc>

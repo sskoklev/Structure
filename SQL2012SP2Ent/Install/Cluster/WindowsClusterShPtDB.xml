@@ -1,0 +1,13 @@
+﻿<doc>
+  <WindowsCluster 
+        ClusterName="CLN-002" 
+        ClusterDescription="SharePoint Database Cluster" 
+        PrimaryNode="DBS-003" 
+        SecondaryNode="DBS-004" 
+        ClusterIP="10.5.7.220" 
+        ClusterNetwork="CNO-003" 
+        ClusterIPName="CNO-004" 
+        WitnessDiskName="WITNESS" 
+        ManagementIPName="ManagementIP">
+  </WindowsCluster>  
+</doc>

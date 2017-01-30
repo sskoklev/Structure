@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<!-- 
+All fields are required
+Instance name must include server name (CNN in the case of a cluster) and instance name, eg Server1\MySQLInstance
+DB name must include the client ID as a suffix as there may be more than one AirWatch DB in the same instance. For eg, AirWatch_AMP, AirWatch_BSL, AirWatch_POC
+-->
+
+<Databases>
+
+    <!-- Sandpit AirWatch -->
+    <Database Server="DBS-101" 
+              InstanceServerName="DBS-101"
+              InstanceName="MWSMOBILITY04"
+              Databases="AirWatch_POC" 
+     />
+
+</Databases>
