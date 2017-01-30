@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<InstallSet>
+    <Install Server="APP-101,APP-103,APP-107,WEB-101" FilePath="\InstallMedia\PrerequisiteInstallerFiles\Windows8.1-KB2999226-x64.msu" Arguments="/quiet /norestart /log:SCRIPTPATH\Logs\CURRENTDATE-KB2999226.log" InstallAccount="agilitydeploy" Desc="Windows10 Universal C Runtime" />
+</InstallSet>
+    <Install Server="APP-801,APP-803,APP-807,WEB-801" FilePath="\InstallMedia\PrerequisiteInstallerFiles\Windows8.1-KB2999226-x64.msu" Arguments="/quiet /norestart /log:SCRIPTPATH\Logs\CURRENTDATE-KB2999226.log" InstallAccount="agilitydeploy" Desc="Windows10 Universal C Runtime" />
+</InstallSet>

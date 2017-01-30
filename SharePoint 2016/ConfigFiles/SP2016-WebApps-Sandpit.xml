@@ -1,0 +1,240 @@
+﻿<?xml version="1.0"?>
+<!-- AutoSPInstaller Sample Configuration File
+-->
+<Configuration Environment="Dev" Version="3.99.51">
+ <!-- The WebApplications section configures the applications and sites that will be created. You can add additional <WebApplication> child tags to create extra web applications.
+         The AddURLsToHOSTS flag will add all Alternate Access Mappings to the local server's HOSTS file and is useful if you are (for example):
+         creating web apps whose URLs are not defined in DNS yet, a test farm, or if you are creating a DR farm, etc. -->
+  <WebApplications AddURLsToHOSTS="true">
+    <!-- Web application attributes are as follows:
+        type:
+            "Portal" is the primary site. Exactly one WebApplication should have this type. It is setup as a trusted file location 
+            for Excel services, and as the portal site connection for other site collections. The script also uses it internally
+            when it requires the URL of an arbitrary site.
+            "MySiteHost" is the host web application for mysites.
+            Any additional web applications that you create should have a type of your own choice such as "Other"
+        name: Name of the web application
+        ApplicationPool: Application pool name
+        ApplicationPoolAccount: <removed> No longer used; we now look for a managed account based on the WebApplication type. If no match is found, we just use the Portal managed account.
+        url: URL of the root site collection in the application pool. Do not include the port number, but do set http/https correctly.
+        port: Port on which the web application runs.
+        UseHostHeader: true = indicates that this web app's IIS site will be configured with a host header. false = host header field in IIS will be blank
+        AddURLToLocalIntranetZone: true = indicates the suffix portion of the web application URL (e.g. *.contoso.com) will be added to Internet Explorer's Local Intranet security zone so you don't get prompted for credentials when browsing the web app URL
+        GrantCurrentUserFullControl: true = will grant the current user (i.e. the setup account) Full Control to the entire web app via the web application's policy
+        databaseName: Name of the first content database.
+        useClaims: false = disable claims based authentication. true = enable claims based authentication.
+        UseBasicAuthentication: false = only accept Kerberos/NTLM claims. true = also accept Basic authentication claims. Has no effect if useClaims is false.
+        UseOnlineWebPartCatalog: false = disable use of the online webpart gallery on the web application. true (default) enable it. -->
+        <!-- MK: 
+            URL will be updated runtime based on the SSL flag and client domain
+            DBInstance will be updated runtime based on Variable
+        -->
+    <WebApplication Name="Portal"> 
+      <Type>Portal</Type>
+      <ApplicationPool>PORTAL_APP_POOL</ApplicationPool>
+      <Url>https://sndwebsyd101w.mwsaust.net</Url>
+      <Port>443</Port>
+      <UseHostHeader>false</UseHostHeader>
+      <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
+      <GrantCurrentUserFullControl>true</GrantCurrentUserFullControl>
+      <UseClaims>true</UseClaims>
+      <UseBasicAuthentication>false</UseBasicAuthentication>
+      <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>     
+      <!-- You can now specify a different DB server/instance or alias per web application and service application. The behavior is slightly different than with the farm DB server though, see below. -->
+      <Database>
+        <!-- Name: Name of the first content database for this web application. -->
+        <Name>Content_Portal</Name>
+        <!-- If you are creating an alias (recommended!), <DBServer> is actually the value of the SQL alias; otherwise it's the NetBIOS name of the SQL server or instance. 
+                     If you leave <DBServer> blank, the default DBServer value for the farm is used -->
+        <DBServer>SP_CONTENT</DBServer>
+        <!-- The script can create a SQL alias for you. Enter the DBInstance, and if you leave <DBPort> blank, script will assume default port value of 1433 -->
+        <DBAlias Create="true">
+          <DBInstance>SQL\SP_CONTENT</DBInstance>
+          <DBPort>49009</DBPort>
+        </DBAlias>
+      </Database>
+      <ManagedPaths>
+        <ManagedPath relativeUrl="sites" explicit="false" />
+      </ManagedPaths>
+      <SiteCollections>
+        <!-- You can specify multiple site collections within a web application.
+                siteUrl: URL of the site collection. Include the port if it is non default for the protocol (80/443). Do not include default ports as this will make the script fail.
+                HostNamedSiteCollection: true = specifies that this will be a host-named site collection. false = specifies that this will be a path-based site collection (make sure you have added a corresponding ManagedPath above).
+                Owner: Site collection owner account in the format DOMAIN\username. If you leave it blank, the app pool account for the web app will be made the primary owner. In either case, the currently logged-in account (the setup account) will be made secondary owner.
+                Name: Name/title of the site collection.
+                Description: Description of the site collection.
+                CustomDatabase: The name (appended to the DBPrefix specified earlier)  of a content database in which this site collection should be created. Will be created automatically if it doesn't exist. If left blank (default), the content database for the web application will be used.
+                SearchUrl: URL of the search site. This may be in another web application / site collection.
+                CustomTemplate: Set to true if a custom template is to be used.
+                Template: Name of the template to use.
+                LCID: Locale ID of the language pack to use for the site collection.
+                Locale: Actual locale of the site for regional settings. e.g. for UK English you use the US English LCID of 1033 but the locale en-gb.
+                        If omitted, the default locale of the LCID is used.
+                Time24: If true, times are displayed using a 24 hour clock. If false, AM/PM is used. If omitted, the default for the LCID is applied. -->
+                <!-- MK: 
+                    siteUrl will be updated runtime based on the SSL flag and client domain. If port is not 80 or 443, append to the siteUrl, e.g. https://siteUrl:999
+                    searchUrl will be updated runtime based on the SSL flag and client domain
+                 -->
+        <SiteCollection siteUrl="https://sndwebsyd101w.mwsaust.net">
+          <Name>Root Site Collection</Name>
+          <Description>Root Site Collection. The site collection is locked.</Description>
+          <HostNamedSiteCollection>false</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase></CustomDatabase>
+          <SearchUrl></SearchUrl>
+          <Template>SPSPORTAL#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://portal.mwsaust.net">
+          <Name>Intranet Portal</Name>
+          <Description>Portal Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_Portal</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>SPSPORTAL#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://teams.mwsaust.net">
+          <Name>Teams</Name>
+          <Description>Teams Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_Teams</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>STS#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://communities.mwsaust.net">
+          <Name>Communities</Name>
+          <Description>Communities Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_Communities</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>COMMUNITY#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://dev.mwsaust.net">
+          <Name>Development</Name>
+          <Description>Development Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_Dev</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>STS#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://search.mwsaust.net">
+          <Name>Search</Name>
+          <Description>Search Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_Search</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>SRCHCEN#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+
+        <SiteCollection siteUrl="https://test-portal.mwsaust.net">
+          <Name>Test Intranet Portal</Name>
+          <Description>Portal Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_TestPortal</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>SPSPORTAL#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://test-teams.mwsaust.net">
+          <Name>Test Teams</Name>
+          <Description>Teams Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_TestTeams</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>STS#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+
+        <SiteCollection siteUrl="https://test-communities.mwsaust.net">
+          <Name>Test Communities</Name>
+          <Description>Communities Site Collection</Description>
+          <HostNamedSiteCollection>true</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase>Content_TestCommunities</CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>COMMUNITY#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+      </SiteCollections>
+    </WebApplication>
+    <WebApplication Name="MySites">
+      <Type>MySiteHost</Type>
+      <ApplicationPool>MYSITES_APP_POOL</ApplicationPool>
+      <Url>https://my.mwsaust.net</Url>
+      <Port>443</Port>
+      <UseHostHeader>true</UseHostHeader>
+      <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
+      <GrantCurrentUserFullControl>true</GrantCurrentUserFullControl>
+      <UseClaims>true</UseClaims>
+      <UseBasicAuthentication>false</UseBasicAuthentication>
+      <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>
+      <!-- You can now specify a different DB server/instance or alias per web application and service application. The behavior is slightly different than with the farm DB server though, see below. -->
+      <Database>
+        <!-- Name: Name of the first content database for this web application. -->
+        <Name>Content_MySites</Name>
+        <!-- If you are creating an alias (recommended!), <DBServer> is actually the value of the SQL alias; otherwise it's the NetBIOS name of the SQL server or instance. 
+                     If you leave <DBServer> blank, the default DBServer value for the farm is used -->
+        <DBServer>SP_CONTENT</DBServer>
+        <!-- The script can create a SQL alias for you. Enter the DBInstance, and if you leave <DBPort> blank, script will assume default port value of 1433 -->
+        <DBAlias Create="true">
+          <DBInstance>SQL\SP_CONTENT</DBInstance>
+          <DBPort>49009</DBPort>
+        </DBAlias>
+      </Database>
+      <ManagedPaths>
+        <ManagedPath relativeUrl="personal" explicit="false" />
+      </ManagedPaths>
+      <SiteCollections>
+        <SiteCollection siteUrl="https://my.mwsaust.net">
+          <Name>My Site Host</Name>
+          <Description>My Site Host</Description>
+          <HostNamedSiteCollection>false</HostNamedSiteCollection>
+          <Owner>sandpit\agilitydeploy</Owner>
+          <CustomDatabase></CustomDatabase>
+          <SearchUrl>https://search.mwsaust.net/pages</SearchUrl>
+          <Template>SPSMSITEHOST#0</Template>
+          <LCID>1033</LCID>
+          <Locale>en-us</Locale>
+          <Time24>true</Time24>
+        </SiteCollection>
+      </SiteCollections>
+    </WebApplication>
+  </WebApplications>
+</Configuration>

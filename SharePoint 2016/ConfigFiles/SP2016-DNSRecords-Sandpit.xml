@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<DNSRecords>
+    <Record Name="portal" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="teams" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="communities" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="dev" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="search" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="test-portal" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="test-communities" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+    <Record Name="test-teams" ZoneName="mwsaust.net" HostNameAliasToResolve="WEB-101" HostNameAlias="" RRType="CName" ></Record>
+</DNSRecords>

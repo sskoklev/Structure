@@ -1,0 +1,7 @@
+﻿<Updates>
+  <Update Name="sts2016-kb3118289-fullfile-x64-glb.exe" Install="true" Desc="September 2016" />
+  <Update Name="sts2016-kb3115088-fullfile-x64-glb.exe" Install="false" Desc="May 2016" />
+  <Update Name="sts2016-kb3115181-fullfile-x64-glb.exe" Install="false" Desc="June 2016" />
+  <Update Name="sts2016-kb3115299-fullfile-x64-glb.exe" Install="false" Desc="July 2016" />
+</Updates>
+
