@@ -1,0 +1,59 @@
+#region ReportingServices
+if ($RSinstance -eq ''){$RSinstance = 'MSSQLSERVER'}
+ 
+$temp = $WarningPreference
+$WarningPreference = 'SilentlyContinue'
+Install-WindowsFeature ?Name NET-Framework-Core
+$WarningPreference = $temp
+ 
+$ArgumentList = '/ACTION="Install" /FEATURES=RS /RSINSTALLMODE="FilesOnlyMode" /INSTANCENAME="'+$RSinstance+'" /INSTANCEID="'+$RSinstance+'" /ENU="True" /QUIETSIMPLE="True" /IACCEPTSQLSERVERLICENSETERMS /UpdateEnabled="True" /UpdateSource="MU" /ERRORREPORTING="False" /SQMREPORTING="'+$SQMoptin+'" /RSSVCACCOUNT='+$env:USERDOMAIN+'\'+$RSappPoolAccount+' /RSSVCPASSWORD='+$RSappPoolAccountPassword+' /RSSVCSTARTUPTYPE="Automatic"'
+Start-Process $SQLinstallFile -ArgumentList $ArgumentList -Wait
+ 
+Write-Host "`nGenerating Reporting Services configuration databases..."
+ 
+$s = New-Object Management.ManagementScope("\\localhost\root\Microsoft\SqlServer\ReportServer\RS_$RSinstance\v12\admin")
+$s.Connect()
+ 
+$sc = New-Object Management.ManagementClass("\\localhost\root\Microsoft\SqlServer\ReportServer\RS_$RSinstance\v12\admin:MSReportServer_ConfigurationSetting")
+$sc.Get()
+ 
+$insts = $sc.GetInstances()
+foreach ($o in $insts) { $inst = $o; }
+ 
+# Set Virtual Directories
+$inst.RemoveURL("ReportServerWebService", "http://$ReportingServicesURL", 1033) | Out-Null
+$inst.RemoveURL("ReportManager", "http://$ReportingServicesURL", 1033) | Out-Null
+ 
+$inst.SetVirtualDirectory("ReportServerWebService", "ReportServer", 1033) | Out-Null
+$inst.SetVirtualDirectory("ReportManager", "ReportManager", 1033) | Out-Null
+ 
+$inst.ReserveURL("ReportServerWebService", "http://$ReportingServicesURL", 1033) | Out-Null
+$inst.ReserveURL("ReportManager", "http://$ReportingServicesURL", 1033) | Out-Null
+ 
+# Create Reporting Services Database
+$script = $inst.GenerateDatabaseCreationScript($RSdbname, 1033, $false)
+ 
+[scriptblock]$scriptBlock = {
+  param($script,$DBinstance)
+    $script.Script | Out-File rs.sql
+    sqlcmd -i rs.sql
+    Remove-Item rs.sql
+}
+Invoke-Command -ComputerName $sqlServer -ScriptBlock $scriptBlock -ArgumentList $script,$DBinstance | Out-Null
+ 
+$script = $inst.GenerateDatabaseRightsScript("$env:USERDOMAIN\$RSappPoolAccount", $RSdbname, $false, $true)
+ 
+[scriptblock]$scriptBlock = {
+  param($script,$DBinstance)
+    $script.Script | Out-File rs.sql
+    sqlcmd -i rs.sql
+    Remove-Item rs.sql
+}
+Invoke-Command -ComputerName $sqlServer -ScriptBlock $scriptBlock -ArgumentList $script,$DBinstance | Out-Null
+ 
+$inst.SetDatabaseConnection($DBinstance, $RSdbname, 2, "", "") | Out-Null
+$inst.SetWindowsServiceIdentity($false, "$env:USERDOMAIN\$RSappPoolAccount", $RSappPoolAccountPassword) | Out-Null
+#$inst.SetUnattendedExecutionAccount("<domain\user>", "<password>") | Out-Null
+$inst.SetServiceState($true, $true, $true) | Out-Null
+$inst.SetEmailConfiguration($true, $RSemailServer, $RSemailAddress) | Out-Null
+#endregion

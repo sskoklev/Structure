@@ -1,0 +1,37 @@
+
+s = New-Object Management.ManagementScope("\\localhost\root\Microsoft\SqlServer\ReportServer\<instance>\v10\admin");
+$s.Connect();
+
+$sc = New-Object Management.ManagementClass("\\localhost\root\Microsoft\SqlServer\ReportServer\<instance>\v10\admin:MSReportServer_ConfigurationSetting");
+$sc.Get();
+
+$insts = $sc.GetInstances()
+foreach ($o in $insts) { $inst = $o; }
+
+# Set Virtual Directories
+$inst.RemoveURL("ReportServerWebService", "http://+:80", 1033);
+$inst.RemoveURL("ReportManager", "http://+:80", 1033);
+
+$inst.SetVirtualDirectory("ReportServerWebService", "ReportServer", 1033);
+$inst.SetVirtualDirectory("ReportManager", "ReportManager", 1033);
+
+$inst.ReserveURL("ReportServerWebService", "http://+:80", 1033);
+$inst.ReserveURL("ReportManager", "http://+:80", 1033);
+
+# Create Reporting Services Database
+$script = $inst.GenerateDatabaseCreationScript("ReportServer", 1033, $false);
+$script.Script | Out-File rs.sql
+sqlcmd -S <serverinstance> -i rs.sql
+
+$script = $inst.GenerateDatabaseRightsScript("<domain\user>", "ReportServer", $false, $true);
+$script.Script | Out-File rs.sql
+sqlcmd -S <serverinstance> -i rs.sql
+
+$inst.SetDatabaseConnection("<serverinstance>", "ReportServer", 2, "", "");
+
+$inst.SetWindowsServiceIdentity($false, "<domain\user>", "<password>");
+$inst.SetUnattendedExecutionAccount("<domain\user>", "<password>");
+
+$inst.SetServiceState($true, $true, $true);
+
+$inst.SetEmailConfiguration($true, "smtp.mycompany.com", "reporting.services@mycompany.co.uk")

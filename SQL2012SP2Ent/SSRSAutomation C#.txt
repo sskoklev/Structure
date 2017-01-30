@@ -1,0 +1,898 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.DirectoryServices;
+using System.IO;
+using System.Linq;
+using System.Management;
+using System.Text;
+using MyCompany.Configuration;
+using MyCompany.Configuration.IIS;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
+using Microsoft.Win32;
+using Microsoft.ReportingServices.SharePoint.Common;
+using System.Security.Principal;
+using System.Globalization;
+using System.ServiceProcess;
+using System.Xml;
+
+namespace MyCompany.Suite.Intuition.Configuration
+{
+    class ReportingServicesInstaller
+    {
+        public enum OPERATION
+        {
+            INVALID = 0,
+            INSTALL = 1,
+            UNINSTALL = 2
+        }
+        private const string _WmiNamespace = @"\\localhost\root\Microsoft\SqlServer\ReportServer\RS_{0}\v10\Admin";   //Must fill in the instance name
+        private const string _WmiRSClass = @"\\localhost\root\Microsoft\SqlServer\ReportServer\RS_{0}\v10\Admin:MSReportServer_ConfigurationSetting";
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private const string _IISSettingsKey = "ReportingServicesReportServer";
+        private const string _EncryptionKeyPassword = "MyCompany01";
+        private static string _serverName = "";
+        private static bool _BackupSuccess;
+
+        private ReportingServicesInstaller()
+        {
+            // class is static only no need to instantiate
+        }
+
+        #region Install commands
+        public enum VirtualDirectoryAction
+        {
+            Install,
+            Remove
+        }
+
+        /// <summary>
+        /// Install
+        /// </summary>
+        /// <returns>true - installed correctly; false - did not install correctly</returns>                        
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        public static bool Install(string configPathName, string installationInputPath, string windowsAccountPassword)
+        {
+            bool success = false;
+            
+            log.Info("Configuring Reporting Services.");
+
+            try
+            {
+                FileInfo configFile = new FileInfo(configPathName);
+                if (!configFile.Exists)
+                    throw new Exception("config file not found: " + configPathName);
+
+                FileInfo installationInputFile = new FileInfo(installationInputPath);
+                if (!installationInputFile.Exists)
+                    throw new Exception("installation input file not found: " + installationInputPath);
+
+                IISManager iisManager = new IISManager(configPathName, installationInputPath, "MTK_INSTALL_DIR_SERVER_COMP");
+                IISSetting iisSettings = iisManager.GetIISSettingByKey("SharepointWebService");
+
+                PropertyLoader propertyLoader = new PropertyLoader();
+                propertyLoader.LoadPopertyLoaderXML(installationInputPath);
+                string serverName = propertyLoader.GetPropropertyValue("MTK_SQL_SERVER_NAME");
+                string intuitionModelDB = propertyLoader.GetPropropertyValue("MTK_SQL_MODEL_DATABASE_NAME");
+                string sharepointUser = propertyLoader.GetPropropertyValue("MTK_SHAREPOINT_USER");
+                string dataDirectoryPath = propertyLoader.GetPropropertyValue("MTK_INSTALL_DIR_INTUITION_DATA");
+
+                string sqlInstanceName = "";
+                string [] temp = serverName.Split(new string [] {"\\"}, StringSplitOptions.None);
+                if (temp.Length == 1)
+                    sqlInstanceName = temp[0];
+                else
+                    sqlInstanceName = temp[1];
+
+                string SSRS_SQLDB = String.Format(CultureInfo.InvariantCulture,"ReportServer_{0}",sqlInstanceName);
+                string connectionString = CommonUtilities.GetSqlServerConnectionString(serverName, intuitionModelDB);
+                string webSiteName = iisSettings.WebSiteName.ToString();
+                string appPoolName = iisSettings.ApplicationPool.ToString();
+
+                _serverName = serverName.Remove(serverName.IndexOf('\\'));
+
+                object serviceName = WMIGetProperty(sqlInstanceName, "ServiceName");
+
+                // Display all settings being used - helpful for debugging at runtime
+                log.Info("SQL Server Name: " + serverName);
+                log.Info("SQL Instance: " + sqlInstanceName);
+                log.Info("Server Name: " + _serverName);
+                log.Info("ReportServer Database: " + SSRS_SQLDB);
+                log.Info("Connection String: " + connectionString);
+                log.Info("WebSite Name: " + webSiteName);
+                log.Info("Application Pool: " + appPoolName);
+                log.Info("Sharepoint User: " + sharepointUser);
+                log.Info("ServiceName: " + serviceName.ToString());
+
+                // Main SSRS Configuration otpions found in Report Configuration tool for SQL
+                /*
+                 * The following sequence is how the Reporting service configuration manager changes the service account identity
+                    Backup encryption key
+                    Stop reporting service
+                    Set Windows Service Identity to account
+                    Create Grant Rights script
+                    Assign Reporting Services Rights to User
+                    Starting report server
+                    Restore encryption key
+                    Remove URL http://+:80
+                    Reserve URL http://+:80
+                    Remove URL http://+:80
+                    Reserve URL http://+:80
+                */
+
+                string encryptionKeyPath = Path.Combine(dataDirectoryPath, "ReportingServices2008EncryptionKeyBackup.snk");
+                Byte[] encryptionKeyFile = BackupReportingServicesEncryptionKey(sqlInstanceName, encryptionKeyPath);
+                
+                //Stop the service
+                SetReportingServicesState(sqlInstanceName, false);
+
+                SetWindowsServiceIdentity(sqlInstanceName, sharepointUser, windowsAccountPassword);
+                CreateReportingServicesDatabase(connectionString, sqlInstanceName, SSRS_SQLDB);
+                SetDatabaseCredentials(sqlInstanceName, serverName, SSRS_SQLDB);
+                AssignDatabaseRights(connectionString, sqlInstanceName, SSRS_SQLDB, sharepointUser, true);
+
+                //start the service
+                SetReportingServicesState(sqlInstanceName, true);
+
+                //restore encryption key
+                if (_BackupSuccess)
+                    RestoreReportingServicesEncryptionKey(sqlInstanceName, encryptionKeyFile);
+
+                CreateLocalReportServicesVirtualDirectory(webSiteName, SSRS_SQLDB, sqlInstanceName);
+                SetUnattendedExecutionAccount(sqlInstanceName, sharepointUser, windowsAccountPassword);
+
+                // Install the Intuition Data Processing Extension (edit SSRS configuration files & security policies)
+                if (!InstallSSRSDataProcessingExtension())
+                {
+                    throw new Exception("Failed to install Intuition Data Processing Extension for SSRS.");
+                }
+
+                // Restart the services
+                CommonUtilities.ResetIis();
+                RestartReportingService(serviceName.ToString(), 60000);
+
+                // Configure Sharepoint Administration tool.
+                AssignSharepointRSVirtualDirectory(webSiteName, SSRS_SQLDB);
+
+                if (_BackupSuccess)
+                    RestoreReportingServicesEncryptionKey(sqlInstanceName, encryptionKeyFile);
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                log.Error("Unable to Configure Reporting Services", ex);
+            }
+            if(success)
+                log.Info("Completed Configuration of Reporting Services.");
+            return success;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        private static void AssignSharepointRSVirtualDirectory(string websiteName, string rsVirtualDirectoryName)
+        {
+            log.Info("Assigning Sharepoint Reporting Services URL.");
+            string computername = Environment.MachineName;
+            if (!string.IsNullOrEmpty(computername))
+            {
+                string port = IISUtils.GetWebSitePort(computername, websiteName).ToString(CultureInfo.CurrentCulture);
+                if(port != "-1")
+                {
+                    try
+                    {
+                        string rsServerUrl = @"http://" + computername + @":" + port + "/" + rsVirtualDirectoryName;
+                        log.Info("attempting url assignment: " + rsServerUrl);
+                        SPRSServiceConfiguration configuration = SPFarm.Local.Services.GetValue<SPRSServiceConfiguration>("ReportingService");
+                        if (configuration == null)
+                        {
+                            configuration = new SPRSServiceConfiguration("ReportingService", SPFarm.Local);
+                        }
+                        configuration.RSServerUrl = rsServerUrl;
+                        configuration.AuthenticationType = RSAuthenticationType.Windows;
+                        configuration.Update();
+                        log.Info("Successfully configured Sharepoint Reporting Services URL.");
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error("Error encountered while attempting to assign configuration to Sharepoint Reporting Services", ex);
+                        throw new Exception("Error encountered while attempting to assign configuration to Sharepoint Reporting Services", ex);
+                    }
+                }
+                else
+                    log.Warn("unable to determine website port... aborting step");
+            }
+            else
+                log.Warn("unable to determine local computername... aborting step");
+        }
+
+        private static void SetReportingServicesState(string sqlInstanceName, bool enable)
+        {
+            ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("SetServiceState");
+            inParams["EnableWindowsService"] = enable;
+            inParams["EnableWebService"] = enable;
+            inParams["EnableReportManager"] = enable;
+            ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetServiceState", inParams);
+            if (enable)
+            {
+                VerifyHRESULT("Enabling reporting services", outParams["HRESULT"], null);
+            }
+            else
+            {
+                VerifyHRESULT("Disabling reporting services", outParams["HRESULT"], null);
+            }
+        }
+
+        private static Byte[] BackupReportingServicesEncryptionKey(string sqlInstanceName, string keyFilePath)
+        {
+            ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("BackupEncryptionKey");
+            inParams["Password"] = _EncryptionKeyPassword;
+            ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "BackupEncryptionKey", inParams);
+            if ((Int32)outParams["HRESULT"] == 0)
+            {
+                VerifyHRESULT("SSRS encryption key back up", outParams["HRESULT"], null);
+                _BackupSuccess = true;
+
+                Byte[] encryptionKeyFile = (Byte[])outParams["KeyFile"];
+                Int32 keyFileLength = (Int32)outParams["Length"];
+
+                Byte[] keyFile = new Byte[keyFileLength];
+                encryptionKeyFile.CopyTo(keyFile, 0);
+
+                if (File.Exists(keyFilePath))
+                {
+                    log.Info(String.Format(CultureInfo.InvariantCulture, "SSRS encryption file already exist, backup skipped: \"{0}\"", keyFilePath));
+                }
+                else
+                {
+                    FileStream fileStream = new FileStream(keyFilePath, FileMode.Create);
+                    fileStream.Write(encryptionKeyFile, 0, keyFileLength);
+                    fileStream.Close();
+                    log.Info(String.Format(CultureInfo.InvariantCulture, "SSRS encryption key backed up successfully to file \"{0}\"", keyFilePath));
+                }
+
+                log.Info("SSRS encryption key backed up successfully");
+                return keyFile;
+            }
+            else
+            {
+                _BackupSuccess = false;
+                return null;
+            }
+        }
+
+        private static void RestoreReportingServicesEncryptionKey(string sqlInstanceName, Byte[] encryptionKeyFile)//, string keyFilePath)
+        {
+            //Int32 keyFileLength = 34;
+            //Byte[] encryptionKeyFile = new byte[keyFileLength];
+            //FileStream fileStream = new FileStream(keyFilePath, FileMode.Open);
+            //keyFileLength = fileStream.Read(encryptionKeyFile, 0, keyFileLength);
+            //fileStream.Close();
+            Int32 keyFileLength = encryptionKeyFile.Length;
+            if (keyFileLength <= 0)
+            {
+                log.Info("SSRS encryption key backup contained no data");
+            }
+            else
+            {
+                //All is good
+                ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("RestoreEncryptionKey");
+                inParams["KeyFile"] = encryptionKeyFile;
+                inParams["Length"] = keyFileLength;
+                inParams["Password"] = _EncryptionKeyPassword;
+                ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "RestoreEncryptionKey", inParams);
+                VerifyHRESULT("SSRS encryption key restore", outParams["HRESULT"], null);
+                log.Info("SSRS encryption key restored successfully");
+            }
+            
+        }
+
+        private static void SetWindowsServiceIdentity(string sqlInstanceName, string windowsAccount, string accountPassword)
+        {
+            string windowsUser = GetDomainUserAccount(GetDomainUserAccount(windowsAccount));
+            if (!string.IsNullOrEmpty(windowsUser))
+            {
+                log.Info("Attempting to set windows service identity to user: " + windowsUser);
+
+                ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("SetWindowsServiceIdentity");
+                inParams["UseBuiltInAccount"] = false;
+                inParams["Account"] = windowsUser;
+                inParams["Password"] = accountPassword;
+                ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetWindowsServiceIdentity", inParams);
+                VerifyHRESULT("set windows service identity", outParams["HRESULT"], null);
+            }
+            else
+                log.Warn("unable to determine local computername... aborting step");
+        }
+        private static void SetUnattendedExecutionAccount(string sqlInstanceName, string windowsAccount, string accountPassword)
+        {
+            string windowsUser = GetDomainUserAccount(GetDomainUserAccount(windowsAccount));
+            if (!string.IsNullOrEmpty(windowsUser))
+            {
+                log.Info("Attempting to set unattented execution account identity to user: " + windowsUser);
+
+                ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("SetUnattendedExecutionAccount");
+                inParams["UserName"] = windowsUser;
+                inParams["Password"] = accountPassword;
+                ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetUnattendedExecutionAccount", inParams);
+                VerifyHRESULT("set unattended execution account identity", outParams["HRESULT"], null);
+            }
+            else
+                log.Warn("unable to determine local computername... aborting step");
+        }
+        private static void AssignDatabaseRights(string connectionString, string sqlInstanceName, string databaseName, string userName, bool isWindowsUser)
+        {
+            log.Info("Attempting to grant SQL (" + databaseName + ") rights to user: " + userName);
+            string script = null;
+            ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("GenerateDatabaseRightsScript");
+            inParams["DatabaseName"] = databaseName;
+            inParams["UserName"] = userName;
+            inParams["IsWindowsUser"] = isWindowsUser;
+            inParams["IsRemote"] = false;
+            ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "GenerateDatabaseRightsScript", inParams);
+            script = outParams["Script"].ToString();
+            VerifyHRESULT("creation of SQL DB grant script", outParams["HRESULT"], null);
+            RunSQLScript(connectionString, script);
+        }
+        //private static void SetWebServiceIdentity(string sqlInstanceName, string applicationPoolName)
+        //{
+        //    log.Info("Set Reporting Services Web Service Identity to use ApplicationPool " + applicationPoolName);
+        //    ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("SetWebServiceIdentity");
+        //    inParams["ApplicationPool"] = applicationPoolName;
+        //    ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetWebServiceIdentity", inParams);
+        //    VerifyHRESULT("setting Web Service Identity", outParams["HRESULT"], null);            
+        //}
+        private static void SetDatabaseCredentials(string sqlInstanceName, string server, string reportServerDB)
+        {
+            log.Info("Setting Database Credentials");
+            ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("SetDatabaseConnection");
+            inParams["Server"] = server;
+            inParams["DatabaseName"] = reportServerDB;
+            inParams["CredentialsType"] = 2; //Windows Service
+            inParams["UserName"] = ""; //Ignored
+            inParams["Password"] = ""; //Ignored
+            ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetDatabaseConnection", inParams);
+            VerifyHRESULT("creation of Database Credentials", outParams["HRESULT"], null);
+        }
+        private static void CreateReportingServicesDatabase(string connectionString, string sqlInstanceName, string databaseName)
+        {
+            Server server = null;
+            log.Info(string.Format(CultureInfo.InvariantCulture, "Preparing to create the Reporting Services database"));
+            SqlConnection connection = new SqlConnection(connectionString);
+            server = new Server(new ServerConnection(connection));
+            server.ConnectionContext.SqlConnectionObject.Open();
+            if (!server.Databases.Contains(databaseName))
+            {
+                log.Info("Creating Reporting Services Database");
+                string script = null;
+                ManagementBaseObject inParams = GetServerClass(sqlInstanceName).GetMethodParameters("GenerateDatabaseCreationScript");
+                inParams["DatabaseName"] = databaseName;
+                inParams["Lcid"] = 1033; //English - United States
+                inParams["IsSharePointMode"] = true;
+                ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "GenerateDatabaseCreationScript", inParams);
+                script = outParams["Script"].ToString();
+                VerifyHRESULT("creation of Reporting Services Database script", outParams["HRESULT"], null);
+
+                RunSQLScript(connectionString, script);
+            }
+            else
+            {
+                log.Info(String.Format(CultureInfo.InvariantCulture, "Database [{0}] already exists", databaseName));
+            }
+        }
+        private static void CreateLocalReportServicesVirtualDirectory(string websiteName, string vdName, string sqlInstanceName)
+        {
+            log.Info("Creating Local Report Services Virtual Directory called "+vdName+" under "+websiteName);
+            string iisPath = IISUtils.GetIISPath(websiteName);
+            if (!String.IsNullOrEmpty(iisPath))
+            {
+                ManagementClass serverClass;
+                ManagementScope scope;
+                scope = new ManagementScope(String.Format(System.Globalization.CultureInfo.InvariantCulture, _WmiNamespace, sqlInstanceName));
+
+                scope.Connect();
+                serverClass = new ManagementClass(String.Format(System.Globalization.CultureInfo.InvariantCulture, _WmiRSClass, sqlInstanceName));
+                serverClass.Get();
+                if (serverClass != null)
+                {
+                    // Loop through the instances of the server class.
+                    ManagementObjectCollection instances = serverClass.GetInstances();
+                    foreach (ManagementObject instance in instances)
+                    {
+                        if (String.Compare(sqlInstanceName, instance.Properties["InstanceName"].Value.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            // if RS Virtual Directory is not assigned already then proceed
+
+                            //Release URL reservation
+                            ManagementBaseObject inParamsRemoveUrl = serverClass.GetMethodParameters("RemoveURL");
+                            inParamsRemoveUrl["Application"] = "ReportServerWebService";
+                            inParamsRemoveUrl["URLString"] = "http://+:80";
+                            inParamsRemoveUrl["Lcid"] = 1033;
+                            instance.InvokeMethod("RemoveURL", inParamsRemoveUrl, null);
+                            //ManagementBaseObject outParamsRemoveUrl = instance.InvokeMethod("RemoveURL", inParamsRemoveUrl, null);
+                            //VerifyHRESULT("Remove registered URL: http://+:80", outParamsRemoveUrl["HRESULT"], outParamsRemoveUrl["Error"] as String);
+
+                            //string existingVirtualDirectoryName = instance.Properties["VirtualDirectoryReportServer"].Value.ToString();
+                            //if (String.IsNullOrEmpty(existingVirtualDirectoryName))
+                            //{
+                                ManagementBaseObject inParams = serverClass.GetMethodParameters("SetVirtualDirectory");
+                                //The application is not valid.  The only valid applications are ReportServerWebService and ReportManager.
+                                inParams["Application"] = "ReportServerWebService";
+                                inParams["VirtualDirectory"] = vdName;
+                                inParams["Lcid"] = 1033;
+                                ManagementBaseObject outParams = instance.InvokeMethod("SetVirtualDirectory", inParams, null);
+                                VerifyHRESULT("creation of Virtual Directory: <" + vdName + ">", outParams["HRESULT"], outParams["Error"] as String);
+                            //}
+                            //else
+                            //{
+                            //    log.Error("VirtualDirectory property of the instance [" + instance.Properties["InstanceName"].Value.ToString() + "] was not empty! Found to be [" + instance.Properties["VirtualDirectoryReportServer"].Value.ToString() + "]");
+                            //    //Add virtual directory
+                            //    ManagementBaseObject inParams = serverClass.GetMethodParameters("SetVirtualDirectory");
+                            //    inParams["Application"] = "ReportServerWebService";
+                            //    inParams["VirtualDirectory"] = vdName;
+                            //    inParams["Lcid"] = 1033;
+                            //    ManagementBaseObject outParams = instance.InvokeMethod("SetVirtualDirectory", inParams, null);
+                            //    VerifyHRESULT("creation of Virtual Directory: <" + vdName + ">", outParams["HRESULT"], outParams["Error"] as String);
+
+                            //}
+
+
+                            
+                            //Reserve URL
+                            ManagementBaseObject inParamsReserveUrl = serverClass.GetMethodParameters("ReserveURL");
+                            inParamsReserveUrl["Application"] = "ReportServerWebService";
+                            inParamsReserveUrl["URLString"] = "http://+:80";
+                            inParamsReserveUrl["Lcid"] = 1033;
+                            ManagementBaseObject outParamsReserveUrl = instance.InvokeMethod("ReserveURL", inParamsReserveUrl, null);
+                            VerifyHRESULT("Reserve URL: http://+:80", outParamsReserveUrl["HRESULT"], outParamsReserveUrl["Error"] as String);
+
+                        }
+                    }
+                }
+                else
+                    log.Error("ManagemenetClass object was found to be null!");
+            }
+            else
+                log.Error("Unable to determine the IIS Path for the website " + websiteName);
+        }
+        // Turned off as this doesnt seem nessecary - leaving in just in case.
+        /*
+        private static void RestartSQLReportingService(string sqlInstanceName)
+        {
+            log.Info("shutting down Windows and Web Services");
+            ManagementBaseObject inParams = GetServerClass().GetMethodParameters("SetServiceState");
+            inParams["EnableWindowsService"] = 0;
+            inParams["EnableWebService"] = 0;
+            ManagementBaseObject outParams = InvokeWMI(sqlInstanceName, "SetServiceState", inParams);
+            VerifyHRESULT("shutting down windows and web services", outParams["HRESULT"]);
+
+            log.Info("starting windows and web services");
+            inParams["EnableWindowsService"] = true;
+            inParams["EnableWebService"] = true;
+            outParams = InvokeWMI(sqlInstanceName, "SetServiceState", inParams);
+            VerifyHRESULT("starting windows and web services", outParams["HRESULT"]);
+        }*/
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        private static void RunSQLScript(string connectionString, string script)
+        {
+            if (!String.IsNullOrEmpty(script))
+            {
+                try
+                {
+                    SqlConnection sqlConnection = new SqlConnection(connectionString);
+                    sqlConnection.Open();
+                    Server server = new Server(new ServerConnection(sqlConnection));
+                    server.ConnectionContext.ExecuteNonQuery(script);
+                }
+                catch (System.Data.SqlClient.SqlException ex)
+                {
+                    log.Error("Error executing SQL script", ex);
+                    throw new Exception("Error executing SQL script", ex);
+                }
+            }
+            log.Info("Successfully executed SQL script.");
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        private static void VerifyHRESULT(string operation, object result, string errorMessage)
+        {
+            string hResult = result.ToString();
+            if (hResult == "0")
+                log.Info("Successfully completed: " + operation);
+            else
+            {
+                String message = String.Empty;
+                if (String.IsNullOrEmpty(errorMessage))
+                {
+                    message = String.Format(CultureInfo.CurrentCulture, "Error encountered in operation: \"{0}\", HRESULT({1}).", operation, hResult);
+                }
+                else
+                {
+                    message = String.Format(CultureInfo.CurrentCulture, "Error encountered in operation: \"{0}\", HRESULT({1}), Error: {2} ", operation, hResult, errorMessage);
+                }
+                log.Warn(message);
+                throw new Exception(message);
+            }
+        }
+
+        private static string GetDomainUserAccount(string username)
+        {
+            string qualifiedDomainUser = "";
+            if(!string.IsNullOrEmpty(username))
+            {
+                string[] items = username.Split(new string[] { "\\" }, StringSplitOptions.None);
+
+                if (items.Length == 1) // if the username does not contain domain information...
+                    qualifiedDomainUser = Environment.MachineName + @"\" + username;
+                else
+                    qualifiedDomainUser = username;
+            }
+            return qualifiedDomainUser;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        private static void RestartReportingService(string serviceName, int timeoutMilliseconds)
+        {
+            ServiceController service = new ServiceController(serviceName);
+            try
+            {
+                if (service.Status != 0 || service.Status == 0) //Ensure service actually exists.
+                {
+                    int millisec1 = Environment.TickCount;
+                    TimeSpan timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds);
+
+                    if (service.Status != ServiceControllerStatus.Stopped)
+                    {
+                        log.Info("shutting down service: " + serviceName);
+                        service.Stop();
+                        service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                    }
+
+                    System.Threading.Thread.Sleep(2000);
+
+                    // count the rest of the timeout
+                    int millisec2 = Environment.TickCount;
+                    timeout = TimeSpan.FromMilliseconds(timeoutMilliseconds - (millisec2 - millisec1));
+
+                    if (service.Status == ServiceControllerStatus.Stopped)
+                    {
+                        log.Info("starting service: " + serviceName);
+                        service.Start();
+                        service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                    }
+                    else
+                        log.Warn("unable to start service: " + serviceName);
+                }
+                else
+                {
+                    log.Error("The service: " + serviceName + " could not be found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error encountered during restarting of service: " + serviceName);
+                throw new Exception("Error encountered during restarting of service: " + serviceName, ex);
+            }
+        }
+        
+        #region WMI helpers
+        private static ManagementClass GetServerClass(string sqlInstanceName)
+        {
+            ManagementClass serverClass = null;
+            ManagementScope scope;
+            scope = new ManagementScope(String.Format(System.Globalization.CultureInfo.InvariantCulture, _WmiNamespace, sqlInstanceName));
+            scope.Connect();
+            serverClass = new ManagementClass(String.Format(System.Globalization.CultureInfo.InvariantCulture, _WmiRSClass, sqlInstanceName));
+            serverClass.Scope = scope;
+            serverClass.Get();
+            return serverClass;
+        }
+        private static ManagementBaseObject InvokeWMI(string instanceName, string wmiFunctionName, ManagementBaseObject inParams)
+        {
+            ManagementBaseObject outParams = null;
+            ManagementClass serverClass = GetServerClass(instanceName);
+            if (serverClass != null)
+            {
+                // Loop through the instances of the server class.
+                ManagementObjectCollection instances = serverClass.GetInstances();
+                foreach (ManagementObject instance in instances)
+                {
+                    if (String.Compare(instanceName, instance.Properties["InstanceName"].Value.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        outParams = instance.InvokeMethod(wmiFunctionName, inParams, null);
+                        break;
+                    }
+                }
+            }
+            return outParams;
+        }
+        private static object WMIGetProperty(string instanceName, string property)
+        {
+            object wmiProperty = null;
+            ManagementClass serverClass = GetServerClass(instanceName);
+            if (serverClass != null)
+            {
+                // Loop through the instances of the server class.
+                ManagementObjectCollection instances = serverClass.GetInstances();
+                foreach (ManagementObject instance in instances)
+                {
+                    if (String.Compare(instanceName, instance.Properties["InstanceName"].Value.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        wmiProperty = instance.GetPropertyValue(property);
+                        break;
+                    }
+                }
+            }
+            return wmiProperty;
+        }
+        #endregion
+        
+        #region Intuition Data Processing Extension Installation
+
+        private static bool AddIntuitionDataProcessingElement(String configFilePath, String configSection)
+        {
+            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            doc.Load(configFilePath);
+
+            log.Debug("Looking for existing Intuition DPE.");
+            XmlNodeList nodeList = doc.SelectNodes("/Configuration/Extensions/" + configSection + "/Extension[@Name = \"INTUITION\"]");
+            foreach (XmlNode node in nodeList)
+            {
+                log.Debug("Found an existing reference, removing it.");
+                node.ParentNode.RemoveChild(node);
+            }
+
+            log.Debug("Creating new reference to Intuition DPE.");
+            nodeList = doc.SelectNodes("/Configuration/Extensions/" + configSection);
+            if (nodeList.Count != 1)
+            {
+                log.Error("Could not find data extensions element in file " + configFilePath);
+                return false;
+            }
+
+            XmlElement newRef = doc.CreateElement("Extension");
+            XmlAttribute attName = doc.CreateAttribute("Name");
+            XmlAttribute attType = doc.CreateAttribute("Type");
+            attName.Value = "INTUITION";
+            attType.Value = "MyCompany.Suite.Intuition.ReportingServices.DataProcessingExtension.ModelServiceConnection,MyCompany.Suite.Intuition.ReportingServices.DataProcessingExtension";
+            newRef.Attributes.Append(attName);
+            newRef.Attributes.Append(attType);
+            nodeList[0].AppendChild(newRef);
+
+            doc.Save(configFilePath);
+
+            return true;
+        }
+
+        private static bool AddIntuitionDataProcessingSecurityElement(String configFilePath)
+        {
+            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            doc.Load(configFilePath);
+
+            log.Debug("Looking for existing Intuition DPE security element.");
+            XmlNodeList nodeList = doc.SelectNodes("/configuration/mscorlib/security/policy/PolicyLevel/CodeGroup/CodeGroup[@Name = \"IntuitionDataProcessingExtensionCodeGroup\"]");
+            foreach (XmlNode node in nodeList)
+            {
+                log.Debug("Found an existing reference, removing it.");
+                node.ParentNode.RemoveChild(node);
+            }
+
+            log.Debug("Creating new CodeGroup for Intuition DPE.");
+            nodeList = doc.SelectNodes("/configuration/mscorlib/security/policy/PolicyLevel/CodeGroup");
+            if (nodeList.Count != 1)
+            {
+                log.Error("Could not find code group element in configuration file " + configFilePath);
+                return false;
+            }
+
+            XmlElement newCodeGroup = doc.CreateElement("CodeGroup");
+            XmlAttribute att;
+
+            att = doc.CreateAttribute("class");
+            att.Value = "UnionCodeGroup";
+            newCodeGroup.Attributes.Append(att);
+
+            att = doc.CreateAttribute("version");
+            att.Value = "1";
+            newCodeGroup.Attributes.Append(att);
+
+            att = doc.CreateAttribute("PermissionSetName");
+            att.Value = "FullTrust";
+            newCodeGroup.Attributes.Append(att);
+
+            att = doc.CreateAttribute("Name");
+            att.Value = "IntuitionDataProcessingExtensionCodeGroup";
+            newCodeGroup.Attributes.Append(att);
+
+            att = doc.CreateAttribute("Description");
+            att.Value = "Grants permission to the Intuition data processing extension for reporting services.";
+            newCodeGroup.Attributes.Append(att);
+
+            XmlElement newMembership = doc.CreateElement("IMembershipCondition");
+
+            att = doc.CreateAttribute("class");
+            att.Value = "StrongNameMembershipCondition";
+            newMembership.Attributes.Append(att);
+
+            att = doc.CreateAttribute("version");
+            att.Value = "1";
+            newMembership.Attributes.Append(att);
+
+            att = doc.CreateAttribute("PublicKeyBlob");
+            att.Value = "002400000480000094000000060200000024000052534131000400000100010083C670BAE2396F30196AA9AF7B8038A5C869921FB5C41AC22706849F217758B8DB8B5078AFB4A46E2CE73272763BF2D5C315604803D74F28B9A99F1EBB912B83DF3FB17EF0128202BA94A03F611E4FACC786F7F03225730DF63190A11F8B24DDDF85459771B9626A1B4C3244DB1AA16C0ACFD15F0CC3CDAF9EA753C25F9E3BC3";
+            newMembership.Attributes.Append(att);
+
+            newCodeGroup.AppendChild(newMembership);
+
+            // This is VERY important.  If our CodeGroup is simply appended to the list, it will generate a permission error in the Report Server.
+            // Therefore we need to place it in the first position in the parent CodeGroup.
+
+            nodeList[0].InsertAfter(newCodeGroup, nodeList[0].FirstChild);
+
+            doc.Save(configFilePath);
+
+            return true;
+
+        }
+
+        private static bool InstallSSRSDataProcessingExtension()
+        {
+            log.Debug("Looking for the SSRS Report Server installation path.");
+            String ssrsInstallPath = "";
+            try
+            {
+                log.Debug("Retrieving registry keys for SSRS installation.");
+                RegistryKey instanceKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\RS");
+                Object instanceValue = instanceKey.GetValue("INTUITION");
+                String instanceName = instanceValue.ToString();
+
+                RegistryKey ssrsKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\" + instanceName + @"\Setup");
+                Object ssrsValue = ssrsKey.GetValue("SQLPath");
+                ssrsInstallPath = ssrsValue.ToString() + @"ReportServer";
+
+                if (!Directory.Exists(ssrsInstallPath))
+                {
+                    log.Error("SSRS installation path is invalid, '" + ssrsInstallPath + "' does not exist.");
+                    return false;
+                }
+
+                log.Debug("Found valid SSRS installation path = " + ssrsInstallPath);
+                log.Debug("About to update 'rsreportserver.config' file.");
+
+                String ssrsReportServerConfigPath = ssrsInstallPath + @"\rsreportserver.config";
+                String ssrsReportServerPreviewPolicyPath = ssrsInstallPath + @"\rssrvpolicy.config";
+                if (!File.Exists(ssrsReportServerConfigPath))
+                {
+                    log.Error("SSRS report server config path is invalid, '" + ssrsReportServerConfigPath + "' does not exist.");
+                    return false;
+                }
+                if (!AddIntuitionDataProcessingElement(ssrsReportServerConfigPath, "Data"))
+                {
+                    log.Error("Could not add data processing extension to '" + ssrsReportServerConfigPath + "'.");
+                    return false;
+                }
+                if (!AddIntuitionDataProcessingSecurityElement(ssrsReportServerPreviewPolicyPath))
+                {
+                    log.Error("Could not add data processing extension to '" + ssrsReportServerPreviewPolicyPath + "'.");
+                    return false;
+                }
+
+                log.Debug("Successfully updated report server config.");
+
+            }
+            catch (NullReferenceException)
+            {
+                log.Error("Could not locate the SQL Server Reporting Services installation path.");
+                return false;
+            }
+
+            IntallSSRSDataProcessingExtensionForDesigner("8.0");
+            IntallSSRSDataProcessingExtensionForDesigner("9.0");
+
+            return true;
+
+        }
+
+        private static void IntallSSRSDataProcessingExtensionForDesigner(string version)
+        {
+            // The next section is optional, if they don't have BIDS installed don't make it a critical error.
+
+            log.Debug("Looking for the SSRS report designer installation path.");
+            try
+            {
+                RegistryKey vsKey = Registry.LocalMachine.OpenSubKey(String.Format(CultureInfo.InvariantCulture,@"SOFTWARE\Microsoft\VisualStudio\{0}",version));
+                Object pathValue = vsKey.GetValue("InstallDir");
+                String bidsInstallPath = pathValue.ToString() + @"PrivateAssemblies";
+
+                log.Debug(String.Format(CultureInfo.InvariantCulture,"About to update report designer config file for VS version {0}.",version));
+
+                String bidsConfigPath = bidsInstallPath + @"\RSReportDesigner.config";
+                if (!AddIntuitionDataProcessingElement(bidsConfigPath, "Data"))
+                {
+                    log.Error("Could not add data processing extension to '" + bidsConfigPath + "'.  Designer support will not be installed.");
+                }
+                if (!AddIntuitionDataProcessingElement(bidsConfigPath, "Designer"))
+                {
+                    log.Error("Could not add data processing designer extension to '" + bidsConfigPath + "'.  Designer support will not be installed.");
+                }
+
+                log.Debug("About to update rspreviewpolicy config file.");
+
+                String bidsPreviewPolicyPath = bidsInstallPath + @"\RSPreviewPolicy.config";
+                if (!AddIntuitionDataProcessingSecurityElement(bidsPreviewPolicyPath))
+                {
+                    log.Error("Could not add data processing extension to '" + bidsPreviewPolicyPath + "'.  Designer support will not be installed.");
+                }
+
+            }
+            catch (NullReferenceException)
+            {
+                log.Warn(String.Format(CultureInfo.InvariantCulture,"Could not locate the Businesss Intelligence Development Studio {0}, designer support will not be installed.",version));
+            }
+        }
+        #endregion
+
+        #endregion    
+    }
+}
+ 
+
+Here is an example of the contents of the configPathName file passed as a parameter of the Install() method above:
+ 
+
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- For the documentation about the settings and bitmask values,
+     see the IISSettings.Config inside ProcessSuiteInfrastructureVSS, path:
+     $/Deployment Infrastructure/Source Code/Source/ConfigurationLibrary/IIS Settings/Configuration
+/-->
+
+<IISSettings>
+  <IISSetting Key="OpcProxyWebService"
+              ApplicationPool="MyProject Data Services" 
+              AppPoolPath="/W3SVC/AppPools" 
+              AddReadSecurity="true"
+              AppCreate="1"  
+              ActualDirectory="#{MTK_INSTALL_DIR_SERVER_COMP}#MyCompany.Suite.MyProject.Services.Model" 
+              ServerName="localhost" 
+              VirtualDirectoryName="MyProjectModelService" 
+              IISRootPath="IIS://" 
+              VirtualDirectorySchemaName="IIsWebVirtualDir" 
+              WebSiteName="MyProject SharePoint"
+              ActiveDirectoryRootPath="Root" 
+              AuthFlagValue="0x00000005" 
+              AccessFlagValue="0x00000201" 
+              AccessSSLFlagValue="0x00000000" 
+              DefaultDocument="default.htm,default.aspx,default.asp" 
+              DirBrowseFlagValue="0x00000000" 
+              AspEnableParentPaths="0x00000001" />
+  <IISSetting Key="SharepointWebService"
+              ApplicationPool="MyProjectSharePointAppPool"
+              AppPoolPath="/W3SVC/AppPools"
+              AddReadSecurity="true"
+              AppCreate="1"
+              ActualDirectory="#{MTK_INSTALL_DIR_SERVER_COMP}#MyCompany.Suite.MyProject.SharePoint.WebServices"
+              ServerName="localhost"
+              VirtualDirectoryName="MyProjectSharepointServices"
+              IISRootPath="IIS://"
+              VirtualDirectorySchemaName="IIsWebVirtualDir"
+              WebSiteName="MyProject SharePoint"
+              ActiveDirectoryRootPath="Root"
+              AuthFlagValue="0x00000005"
+              AccessFlagValue="0x00000201"
+              AccessSSLFlagValue="0x00000000"
+              DefaultDocument="default.htm,default.aspx,default.asp"
+              DirBrowseFlagValue="0x00000000"
+              AspEnableParentPaths="0x00000001" />
+</IISSettings>
+Here is an example of the contents of the installationInputPath file passed as a parameter of the Install() method above:
+<Properties>
+ <PropertyGroup>
+  <Property Name="MTK_INSTALL_DIR_SERVER_COMP" Encrypted="No">C:\Program Files\MyCompany\ProcessSuite\MyProject\</Property> 
+  <Property Name="MTK_SQL_SERVER_NAME" Encrypted="No">(local)\MyProject</Property> 
+  <Property Name="MTK_SQL_MODEL_DATABASE_NAME" Encrypted="No">MyProjectModelDB</Property> 
+  <Property Name="MTK_SHAREPOINT_USER" Encrypted="No">MyComputer\MyProjectService</Property> 
+  <Property Name="MTK_INSTALL_DIR_INTUITION_DATA" Encrypted="No">C:\Documents and Settings\All Users\Application Data\MyCompany\ProcessSuite\MyProject\Data\</Property> 
+</Properties>
