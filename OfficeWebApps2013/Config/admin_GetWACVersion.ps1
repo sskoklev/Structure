@@ -1,0 +1,1 @@
+﻿(Invoke-WebRequest https://OfficeAppsclient0.mwsaust.net/m/met/participant.svc/jsonAnonymous/BroadcastPing).Headers["X-OfficeVersion"]

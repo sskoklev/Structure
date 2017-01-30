@@ -1,0 +1,9 @@
+<Configuration>
+	<Logging Type="verbose" Path="%temp%" Template="Wac Server Setup(*).log"/>
+	<Display Level="none" CompletionNotice="no" />
+  <PIDKEY Value=""/>
+  <INSTALLLOCATION Value="" />
+	<Setting Id="USINGUIINSTALLMODE" Value="0"/>
+	<Setting Id="SETUPTYPE" Value="CLEAN_INSTALL"/>
+	<Setting Id="SETUP_REBOOT" Value="Never"/>
+</Configuration>

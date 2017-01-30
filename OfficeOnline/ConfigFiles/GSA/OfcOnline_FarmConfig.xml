@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<Configuration>
+  <UseSSL>true</UseSSL>
+  <EditingEnabled>false</EditingEnabled>
+  <SSLOffloaded>false</SSLOffloaded>
+  <PrimaryServer></PrimaryServer>
+  <CacheLocation></CacheLocation>
+  <!-- Default CacheSizeInGB = 15 -->
+  <CacheSizeInGB>15</CacheSizeInGB>
+  <!-- Specifies the friendly name of the certificate that Office Online Server uses to create HTTPS bindings.
+        This value is used on every server that joins the Office Online Server farm. Therefore, every server in the farm must have a certificate that has this friendly name. 
+    -->
+  <CertificateName></CertificateName>
+  <!-- Specifies the URL root that clients use to access the Office Online Server farm from the Internet. 
+        In the case of a load-balanced, multiserver Office Online Server farm, the external URL is bound to the IP address of the external-facing load balancer.
+    -->
+  <ExternalURL></ExternalURL>
+  <!-- Specifies the URL root that clients use to access the Office Online Server farm from the intranet.
+        The URL will be built sutomatically by adding https prefix and FQDN suffix
+    -->
+  <InternalURL></InternalURL>
+  <!-- Specifies the location on the local computer where activity logs are stored.
+        The location applies for every server in the farm and cannot be customized on a per-server basis. 
+        The default location is %programdata%\Microsoft\OfficeWebApps\Data\Logs\ULS\.
+    -->
+  <LogLocation></LogLocation>
+  <!-- Specifies the number of days that log entries are stored. Log entries older than the configured date are trimmed.
+        The type must be an integer value in the range of 0 to 365. The default value is 7 days.
+    -->
+  <LogRetentionInDays>7</LogRetentionInDays>
+  <!-- Specifies how much information is stored in the trace log files. -->
+  <LogVerbosity>Unexpected</LogVerbosity>
+  <!-- Specifies, in megabytes, the maximum amount of memory that the rendering cache can use.
+        The type must be an integer value in the range of 0 to any positive integer. The default size is 75 MB.
+    -->
+  <MaxMemoryCacheSizeInMB>75</MaxMemoryCacheSizeInMB>
+  <!--Specifies the location of the temporary cache for use by the Word and PowerPoint Viewing Services.
+        The default location is %programdata%\Microsoft\OfficeWebApps\Working\waccache\.
+    -->
+  <RenderingLocalCacheLocation></RenderingLocalCacheLocation>
+</Configuration>

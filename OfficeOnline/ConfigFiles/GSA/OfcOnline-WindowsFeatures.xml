@@ -1,0 +1,28 @@
+﻿<doc>
+  <WindowsFeature FeatureName="NET-Framework-45-Core"></WindowsFeature>
+  <WindowsFeature FeatureName="NET-Framework-45-ASPNET"></WindowsFeature>
+  <WindowsFeature FeatureName="Web-Mgmt-Console"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Common-Http"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Default-Doc"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Static-Content"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Filtering"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Windows-Auth"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Net-Ext45"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Asp-Net45"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-ISAPI-Ext"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-ISAPI-Filter"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Includes"></WindowsFeature>   
+  <WindowsFeature FeatureName="InkandHandwritingServices"></WindowsFeature>   
+  <WindowsFeature FeatureName="Windows-Identity-Foundation"></WindowsFeature>  
+  <WindowsFeature FeatureName="NET-WCF-HTTP-Activation45"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Stat-Compression"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Dyn-Compression"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Server"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-App-Dev"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Mgmt-Tools"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Security"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-WebServer"></WindowsFeature>  
+  <WindowsFeature FeatureName="Web-Performance"></WindowsFeature> 
+  <WindowsFeature FeatureName="NET-HTTP-Activation"></WindowsFeature> 
+  <WindowsFeature FeatureName="NET-Non-HTTP-Activ"></WindowsFeature> 
+</doc>

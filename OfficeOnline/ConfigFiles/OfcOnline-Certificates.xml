@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<SSLCertificates>
+    <Certificate Server="APP-105" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-105" FileLocation="\SSLCertificates\OfficeOnline-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS OfficeOnline" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-106" FileLocation="\SSLCertificates\mwsaust_Jun2016_export.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-106" FileLocation="\SSLCertificates\OfficeOnline-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS OfficeOnline" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root" ></Certificate>
+</SSLCertificates>

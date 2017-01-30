@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<InstallSet>
+
+ <Install Server="OWA-01,OWA-02" FilePath="\InstallMedia\PreReqs\MicrosoftIdentityExtensions-64.msi" Arguments="/q /norestart /log SCRIPTPATH\Logs\CURRENTDATE-MicrosoftIdentityExtensions-64.log" InstallAccount="agilitydeploy" Desc="Microsoft Identity Model Extension" />
+ <Install Server="OWA-01,OWA-02" FilePath="\InstallMedia\PreReqs\vc_redist.x64.exe" Arguments="/q /norestart /log SCRIPTPATH\Logs\CURRENTDATE-VCRedistx64.log" InstallAccount="agilitydeploy" Desc="visual c++ redistributable [vcredist_x64.exe]" />
+ <Install Server="OWA-01,OWA-02" FilePath="\InstallMedia\PreReqs\NDP452-KB2901907-x86-x64-AllOS-ENU.exe" Arguments="/q /norestart /log SCRIPTPATH\Logs\CURRENTDATE-NDP452.log" InstallAccount="agilitydeploy" Desc="Microsoft .NET Framework 4.5.2 (Offline Installer)" />
+</InstallSet>
