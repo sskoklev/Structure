@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<!--
+Note that the server requires a dash
+Remove the sample line below before running
+-->
+
+<InstallSet>
+    <Install Server="AS-001" FilePath="\InstallMedia\Prerequisites\vcredist2008_SP1_x64.exe" Arguments="/qb" InstallAccount="agilitydeploy" Desc="Microsoft Visual C++ 2008(x64)" />
+</InstallSet>

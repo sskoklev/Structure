@@ -1,0 +1,7 @@
+﻿<!--
+The admin-GetFeatures.ps1 found in the same directory as this file can be used to help you find the names of the required features
+-->
+
+<doc>
+  <WindowsFeature FeatureName="Failover-Clustering"></WindowsFeature>  
+</doc>

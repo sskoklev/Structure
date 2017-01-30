@@ -1,0 +1,6 @@
+﻿<?xml version="1.0"?>
+<DBServers>
+    <Alias Name="SP_CONFIG" Create="true" DBServer="DBS-101" DBInstance="MWSSPCONFIG08" DBPort="49008"></Alias>
+    <Alias Name="SP_CONTENT" Create="true" DBServer="DBS-101" DBInstance="MWSSPCONTENT09" DBPort="49009"></Alias>
+    <Alias Name="VDS" Create="true" DBServer="DBS-101" DBInstance="MWSVDS02" DBPort="49002"></Alias>
+</DBServers>

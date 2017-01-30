@@ -1,0 +1,4 @@
+﻿<?xml version="1.0"?>
+<SSLCertificates>
+    <Certificate Server="APP-001" FileLocation="\SSLCertificates\Wildcard.pfx" Password="" FriendlyName="MWS2R2 Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\SharePoint" ></Certificate>
+</SSLCertificates>
