@@ -1,0 +1,1 @@
+﻿Remove-SPWOPIBinding –Server "OfficeApps.MWSAust.Net"

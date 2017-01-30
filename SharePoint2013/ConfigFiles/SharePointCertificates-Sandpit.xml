@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<SSLCertificates>
+    <!--
+    <Certificate Server="APP-001" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\SharePoint" ></Certificate>
+    <Certificate Server="APP-001" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-002" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\SharePoint" ></Certificate>
+    <Certificate Server="APP-002" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-003" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\SharePoint" ></Certificate>
+    <Certificate Server="APP-003" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="APP-004" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root;cert:\LocalMachine\SharePoint" ></Certificate>
+    <Certificate Server="APP-004" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+    -->
+
+    <Certificate Server="WEB-001" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="WEB-001" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+
+    <Certificate Server="WEB-002" FileLocation="\SSLCertificates\wildcard-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS Wildcard" Store="cert:\LocalMachine\My;cert:\LocalMachine\Root" ></Certificate>
+    <Certificate Server="WEB-002" FileLocation="\SSLCertificates\OfficeApps-Sandpit.pfx" Password="mws2Passw0rd" FriendlyName="MWS OfficeApps" Store="cert:\LocalMachine\Root" ></Certificate>
+
+</SSLCertificates>

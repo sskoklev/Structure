@@ -1,0 +1,1 @@
+﻿(Get-ItemProperty "C:\Program Files\AppFabric 1.1 for Windows Server\PowershellModules\DistributedCacheConfiguration\Microsoft.ApplicationServer.Caching.Configuration.dll" -Name VersionInfo).VersionInfo.ProductVersion

@@ -1,0 +1,30 @@
+﻿
+body
+{
+background-color:white;
+font-family:Tahoma;
+font-size:10pt;
+}
+th
+{
+background-color:green;
+color:White;
+}
+table , th , td
+{
+border:1px solid green;
+}
+h4
+{
+border:30px;
+}
+h4:hover
+{
+color:blue;
+cursor:pointer;
+}
+tr:hover
+{
+background-color:#00FF00;
+}
+        

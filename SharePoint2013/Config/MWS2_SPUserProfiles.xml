@@ -1,0 +1,35 @@
+﻿<?xml version="1.0"?>
+<!-- 
+    Create User profile Service Application on the Provision server. Supported values is Localhost (local server), False (no UPSA), True (local server).
+    Start User profile Synch Service on the SYnchServer.
+    If Provision = false, UPSS will not be started on any server.
+    It is assumed, the script to create farm, managed accts, etc has been run.
+-->
+<Configuration Environment="Dev" Version="3.98">
+ <ServiceApps>
+    <UserProfileServiceApp Provision="localhost" 
+                            Name="User Profile Service Application" 
+                            ProxyName="User Profile Service Application" 
+                            MySiteHostLocation="my" 
+                            MySiteManagedPath="personal" 
+                            EnableNetBIOSDomainNames="false" 
+                            SynchServer="APP-001" 
+                            StartProfileSync="false" 
+                            CreateDefaultSyncConnection="false" 
+                            SyncConnectionAccount="svc_sp_userprofile" 
+                            SyncConnectionAccountPassword="">
+      <!-- You can specify a different DB server/instance or alias per web application and service application. The behavior is slightly different than with the farm DB server though, see below. -->
+      <Database>
+        <!-- <*DB> below designates the suffix portion of the database name. For example if your DBPrefix (above) was "SharePoint", and the name below was "ServiceApp", your full DB name would be "SharePoint_ServiceApp" -->
+        <ProfileDB>Profile</ProfileDB>
+        <SyncDB>Sync</SyncDB>
+        <SocialDB>Social</SocialDB>
+        <!-- If you are creating an alias (recommended!), <DBServer> is actually the value of the SQL alias; otherwise it's the NetBIOS name of the SQL server or instance. 
+                     If you leave <DBServer> blank, the default DBServer value for the farm is used -->
+        <DBServer>SP_USERPROFILE</DBServer>
+        <!-- The script can create a SQL alias for you. Enter the DBInstance, and if you leave <DBPort> blank, script will assume default port value of 1433 -->
+        <DBAlias Create="true" DBInstance="sp_userprofile" DBPort="49013" />
+      </Database>
+    </UserProfileServiceApp>
+</ServiceApps>
+</Configuration>
